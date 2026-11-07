@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17142b">
+<title>BattleFeed — Play Together</title>
+<style>
+:root{--night:#141322;--slate:#28263b;--muted:#9c99b4;--white:#fffefd;--line:#ffffff2b;--coral:#ff6379;--citrus:#d8ff52;--teal:#64edd4;--blue:#8c81ff;--cream:#faf8f3;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;}body{font-family:Inter,"Arial",system-ui,-apple-system,sans-serif;background:#141222;color:#fff;overflow-x:hidden;line-height:1.35}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid var(--citrus);outline-offset:3px}button:disabled{opacity:.5;cursor:not-allowed}h1,h2,h3,p{margin-top:0} .shell{width:100%;min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,480px) minmax(0,1fr);align-items:center;gap:clamp(14px,3vw,45px);max-width:1530px;margin:auto;padding:23px clamp(16px,3vw,56px)}
+.background{position:fixed;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(50% 60% at 7% 20%,#9b36ca36,transparent),radial-gradient(40% 45% at 99% 75%,#ff6b8830,transparent),#141222}.left,.right{max-width:320px} .kicker{font-size:11px;font-weight:950;letter-spacing:.23em;color:var(--citrus)}.display{font-size:clamp(40px,4vw,66px);font-weight:1000;letter-spacing:-.085em;line-height:.94;margin:17px 0 22px}.display span{color:var(--citrus)}.aside-text{font-size:15px;color:#c6c1d1;max-width:300px;line-height:1.7}.sidebox{border-top:1px solid #ffffff36;padding-top:20px;margin-top:35px;color:#b9b3cb;font-size:12px;line-height:1.7}.sidebox strong{color:white}.liststat{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #ffffff22;font-size:13px;color:#aaa6bc}.liststat b{color:white}.right h2{font-size:19px;letter-spacing:-.05em}.hintpill{padding:13px 15px;border-radius:14px;background:#ffffff10;border:1px solid #ffffff21;margin-top:22px;font-size:12px;color:#d7d3e4;line-height:1.6}
+.brand{display:flex;align-items:center;gap:7px;font-weight:1000;letter-spacing:-.065em;font-size:22px;white-space:nowrap}.mark{display:flex;align-items:center;justify-content:center;width:31px;height:31px;line-height:1;border-radius:9px;background:#fff;color:#141322;font-size:16px;letter-spacing:-.075em;transform:rotate(-7deg)}
+.app{width:100%;height:min(900px,96svh);min-height:670px;position:relative;display:flex;flex-direction:column;border:1px solid #ffffff4e;border-radius:33px;overflow:hidden;background:linear-gradient(150deg,#262342,#17172e);box-shadow:0 35px 110px #000b,0 0 65px #af5aff22}.app:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 86% -7%,#917fff66,transparent 36%)}.app>*{position:relative;z-index:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:17px 18px 10px;gap:10px}.counter{font-weight:900;font-size:11px;letter-spacing:.08em;display:flex;align-items:center;gap:7px;color:#d8d3e9}.online-dot{height:7px;width:7px;border-radius:50%;background:var(--citrus);box-shadow:0 0 0 4px #d8ff521f}
+.feed{display:flex;flex:1;min-height:0;flex-direction:column;padding:2px 15px 0;touch-action:pan-y}.top-controls{display:flex;align-items:center;gap:7px;margin:8px 0 15px}.switch{display:flex;background:#0e0d1b7a;border:1px solid #ffffff28;padding:4px;border-radius:999px;flex:1}.switch button{border:0;background:transparent;color:#c5bbda;padding:9px 12px;font-size:11px;border-radius:999px;font-weight:900;letter-spacing:.03em;flex:1}.switch button.active{background:#fbf8f2;color:#181629;box-shadow:0 2px 8px #0002}.circlebtn{background:#ffffff16;border:1px solid #ffffff32;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:white;flex-shrink:0}.circlebtn svg{width:18px;height:18px}.pill{border:1px solid #ffffff35;border-radius:999px;padding:7px 11px;font-size:10px;letter-spacing:.04em;font-weight:900;color:#e3def2;white-space:nowrap}
+.feed-main{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:#7e72fa;border-radius:24px;padding:16px;isolation:isolate;box-shadow:inset 0 0 0 1px #ffffff22}.feed-main:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 86% 15%,#ffffff7a,transparent 33%),radial-gradient(ellipse at 0% 90%,#34206f77,transparent 60%)}.feed-main:after{content:"";position:absolute;z-index:-1;width:250px;height:250px;right:-115px;top:80px;border:47px solid #ffffff17;border-radius:50%;transform:rotate(19deg);pointer-events:none}.theme-coral{background:#ff647d}.theme-blue{background:#6f7bf5}.theme-lime{background:#92ad45}.theme-peach{background:#db7886}.theme-violet{background:#906de9}.theme-mint{background:#189e97}.theme-pink{background:#d74d91}.theme-orange{background:#d77945}
+.title-row{display:flex;align-items:center;justify-content:space-between;gap:10px}.tiny-label{font-size:10px;font-weight:900;letter-spacing:.14em;opacity:.9;text-transform:uppercase}.step-nav{display:flex;gap:7px}.step-nav button{width:27px;height:27px;background:#11112535;border:1px solid #ffffff77;color:white;border-radius:50%;font-weight:900;font-size:17px;line-height:1}.title{font-weight:1000;font-size:clamp(27px,3.8vh,35px);line-height:.98;letter-spacing:-.08em;margin:12px 0 5px;text-wrap:balance}.subtitle{font-size:12px;font-weight:750;color:#fffdeb;opacity:.93;min-height:15px;margin:0 0 10px}
+.playboard{min-height:0;flex:1;display:flex;flex-direction:column;background:#191a35eb;border:1px solid #ffffff48;border-radius:19px;padding:10px;box-shadow:0 15px 30px #17152433}.mini-hud{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-bottom:7px;font-size:11px;font-weight:900;letter-spacing:.03em;color:white}.mini-hud strong{color:var(--citrus)}.stage{position:relative;flex:1;min-height:205px;background:radial-gradient(circle at 40% 15%,#52437e80,transparent 69%),#16172c;border-radius:13px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8px;overflow:hidden;touch-action:manipulation}.stage canvas{max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;touch-action:none}.stage button{touch-action:manipulation}.stage .center{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:10px;width:100%;padding:12px}.stage .center h3{font-size:24px;letter-spacing:-.065em;font-weight:1000;margin:0}.stage .center p{color:#d8d1e8;font-size:12px;margin:0;line-height:1.5;max-width:265px}.stage .starticon{width:75px;height:75px;border-radius:22px;background:linear-gradient(145deg,#ff7aa5,#927ef9);display:grid;place-items:center;color:#fff;font-size:38px;font-weight:950;box-shadow:0 12px 35px #0006}.btn{background:#ffffff16;color:white;border:1px solid #ffffff38;padding:12px 15px;border-radius:12px;font-weight:950;font-size:12px;letter-spacing:.015em;min-height:41px}.btn.main{background:var(--citrus);border:0;color:#1e2030}.btn.white{background:white;border:0;color:#1f1b2e}.btn:active{transform:scale(.98)}.btn.full{width:100%}.inlinebuttons{display:flex;gap:8px}.inlinebuttons>*{flex:1}.result{position:absolute;inset:0;border-radius:12px;background:#121328ed;z-index:8;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:16px;gap:9px;backdrop-filter:blur(11px)}.result .big{font-size:26px;font-weight:1000;color:var(--citrus);width:64px;height:64px;border-radius:19px;background:#cfff4b1c;display:grid;place-items:center}.result h3{margin:0;font-size:25px;line-height:1;letter-spacing:-.06em}.result p{margin:0;font-size:11px;color:#d5d0dd;line-height:1.45;max-width:260px}.result .buttons{display:flex;gap:8px;width:100%;max-width:290px}.result .buttons>*{flex:1}.result .roundmeta{color:#a7ffa0;font-weight:900;font-size:11px;letter-spacing:.09em}
+.footer-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}.diffrow{display:flex;gap:4px;padding:4px;background:#17162c82;border-radius:999px;border:1px solid #ffffff2b;min-width:0;flex:1}.diffrow button{flex:1;padding:7px 3px;min-width:0;font-size:10px;color:#fff5;border:0;border-radius:999px;background:transparent;font-weight:900;color:#ebdaed}.diffrow button.active{background:#fff;color:#1e1c2d}.instructions{font-size:11px;font-weight:700;margin:9px 1px 0;line-height:1.45;color:#fff;opacity:.93;min-height:30px}.friend-meta{font-size:10px;font-weight:900;opacity:.85;line-height:1.3;margin-top:5px}
+.swipe-label{display:flex;justify-content:center;align-items:center;gap:10px;padding:10px 0 8px;font-size:10px;font-weight:900;color:#d0c8e8;letter-spacing:.18em}.swipe-line{height:1px;background:#fff3;width:28px}.swipe-label svg{width:11px;height:11px}
+.bottom{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #ffffff21;padding:9px 15px calc(12px + env(safe-area-inset-bottom));background:#151428}.bottom button{background:none;border:0;color:#a39dbd;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:850}.bottom button.selected{color:white}.bottom svg{width:21px;height:21px}.overlay{position:absolute;inset:0;z-index:30;background:#0c0d19db;backdrop-filter:blur(13px);display:flex;align-items:flex-end;justify-content:center}.overlay[hidden]{display:none}.sheet{width:100%;background:#21213a;border:1px solid #ffffff3f;border-bottom:none;border-radius:24px 24px 0 0;padding:23px 20px 30px;box-shadow:0 -20px 50px #0005;max-height:80%;overflow:auto}.sheet h2{font-size:25px;letter-spacing:-.06em;margin:4px 0 8px}.sheet p{font-size:13px;color:#d2cbdf;line-height:1.55}.sheet input{width:100%;border:1px solid #ffffff55;background:#ffffff13;border-radius:12px;color:white;padding:14px;font-size:14px;text-transform:uppercase;margin:8px 0 12px}.sheet .close{float:right;background:#ffffff18;border:0;border-radius:50%;width:32px;height:32px;color:white;font-size:19px}.sheet .smallprint{font-size:11px;color:#aaa6c6}.stats-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #ffffff20;font-size:13px}.stats-row strong{color:var(--citrus)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;padding:11px 16px;border-radius:13px;background:#fff;color:#22213a;font-size:12px;font-weight:850;display:none;z-index:100;max-width:calc(100vw - 20px);text-align:center;box-shadow:0 10px 35px #0006}.toast.show{display:block}
+/* Existing game modes, redesigned to sit inside the feed stage. */
+.gridgame{width:100%;display:grid;gap:5px;max-width:300px;max-height:270px}.cell{border-radius:8px;background:#64549c;aspect-ratio:1;border:1px solid #ffffff28;display:grid;place-items:center;color:white;font-weight:900;font-size:15px;min-width:0;min-height:0;padding:0}.cell.wall{background:#151325}.cell.player{background:#bcff6d;color:#122536}.cell.goal{background:#ff789b;color:#341c36}.controls{display:grid;grid-template-columns:repeat(3,42px);gap:4px;margin-top:7px}.controls button{border:1px solid #ffffff44;border-radius:8px;background:#604889;height:31px;font-size:18px;color:white}.controls .up{grid-column:2}.controls .left{grid-column:1;grid-row:2}.controls .down{grid-column:2;grid-row:2}.controls .right{grid-column:3;grid-row:2}.choicegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:100%;max-width:300px}.option{border:1px solid #ffffff35;background:#55417c;border-radius:12px;padding:14px 7px;font-size:16px;font-weight:950;min-height:52px;color:white}.option:hover{background:#7659a5}.hint{font-size:11px;text-align:center;color:#d9d2ea;margin:4px 0}.memorycell{border-radius:13px;background:linear-gradient(135deg,#67509d,#3b3069);border:2px solid #ffffff24}.memorycell.lit{background:#caff5c;box-shadow:0 0 22px #d0ff658c}.gameinput{border:1px solid #ffffff50;background:#ffffff19;border-radius:11px;color:white;font-size:20px;padding:12px;text-align:center;width:90%;max-width:250px}.bigmessage{font-size:18px;font-weight:900;text-align:center}.flashcard{border:1px solid #ffffff33;background:#ffffff15;padding:13px;border-radius:14px;width:100%;max-width:305px;text-align:center}.digits{display:flex;gap:5px}.digits input{border:1px solid #ffffff60;background:#fff2;color:white;border-radius:10px;text-align:center;font-size:25px;font-weight:900;width:41px;height:49px}.cluebox{background:#ffffff11;border:1px solid #ffffff25;border-radius:12px;padding:9px;font-size:11px;color:#e1d4f0;max-height:74px;overflow:auto;width:98%;max-width:310px;line-height:1.5}.large{font-size:34px;font-weight:1000}.aboutbox{font-size:13px;line-height:1.65}
+@media(max-width:1040px){.shell{grid-template-columns:1fr minmax(335px,480px) 1fr;gap:12px}.left,.right{display:none}.app{grid-column:2;min-height:650px}}@media(max-width:560px){html,body{height:100%;overflow:hidden}.shell{padding:0;display:block;min-height:100svh}.app{width:100%;height:100svh;min-height:0;max-height:none;border:0;border-radius:0;box-shadow:none}.topbar{padding-top:max(15px,env(safe-area-inset-top))}.feed{padding:0 10px}.feed-main{border-radius:20px}.title{font-size:29px}.footer-tools{gap:4px}.diffrow button{font-size:9px}.playboard{padding:8px}.stage{min-height:160px}.swipe-label{padding:7px 0}}
+@media(max-height:740px){.app{min-height:620px;height:97svh}.topbar{padding-top:11px;padding-bottom:5px}.top-controls{margin:4px 0 8px}.title{font-size:26px;margin:7px 0 3px}.subtitle{margin:0 0 7px}.feed-main{padding:12px}.stage{min-height:190px}.swipe-label{padding:6px 0}.bottom{padding-top:7px;padding-bottom:7px}}@media(max-width:560px) and (max-height:700px){.app{height:100svh;min-height:0}.feed-main{padding:9px}.stage{min-height:130px}.title{font-size:25px}.subtitle{font-size:10px}.bottom{padding-bottom:calc(7px + env(safe-area-inset-bottom))}}
+
+/* v0.9: motion-tuned swipe deck */
+:root{--coral:#ff496d;--citrus:#dfff42;--teal:#26e5bc;--blue:#537dff}
+.background{background:radial-gradient(circle at 7% 15%,#5924a380,transparent 25%),radial-gradient(circle at 90% 84%,#e23c6270,transparent 30%),#121028}
+.app{background:#231a39;border:2px solid #ffffff60;box-shadow:10px 14px 0 #090a14,0 35px 100px #0008}
+.app:before{background:linear-gradient(120deg,#ff6d9344 0%,transparent 20%,transparent 80%,#64d9ff22 100%)}
+.mark{background:var(--citrus);border-radius:7px;transform:rotate(-9deg);box-shadow:3px 3px 0 #fe5185}
+.brand{font-size:24px}.brand span:last-child{color:var(--citrus)!important}
+.switch{background:#37284e;border:1px solid #ffffff40}.switch button.active{background:var(--citrus);color:#1b1a34}
+.swipe-viewport{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:18px;isolation:isolate;touch-action:none;overscroll-behavior:contain;contain:layout paint}
+.swipe-viewport>.feed-main{position:absolute;inset:0;width:100%;height:100%;min-height:0;flex:none;will-change:transform;margin:0;border-radius:18px;box-shadow:none;transform:translate3d(0,0,0)}
+.feed-main{border:2px solid #ffffff77}
+.feed-main:before{background:radial-gradient(circle at 82% 13%,#fff8 0 6%,transparent 6.2%),radial-gradient(circle at 10% 93%,#17144730 0 11%,transparent 11.5%),repeating-linear-gradient(135deg,transparent 0 18px,#ffffff0d 18px 20px)}
+.feed-main:after{width:125px;height:125px;border:16px solid #ffffff20;right:-48px;top:56px;transform:rotate(-12deg)}
+.theme-coral{background:#fd4677}.theme-blue{background:#4c72ec}.theme-lime{background:#9db936}.theme-peach{background:#ef7c58}.theme-violet{background:#885deb}.theme-mint{background:#08a7a1}.theme-pink{background:#ed4c99}.theme-orange{background:#eb8135}
+.title{font-size:clamp(29px,4.6vh,39px);line-height:.96;text-shadow:2px 2px 0 #120a2627;letter-spacing:-.075em}
+.tiny-label{background:#191a30;padding:5px 9px;border-radius:4px;letter-spacing:.06em;font-size:10px;opacity:1}
+.playboard{background:#20203c;border:2px solid #fff6;box-shadow:5px 6px 0 #1f1a2866;border-radius:13px}
+.stage{background:#17172f;border-radius:10px}
+.btn{border-radius:9px;box-shadow:2px 3px 0 #090a1d33}.btn.main{background:#dfff42}.btn.white{background:white}
+.step-nav button{border-radius:7px;background:#1d1b3bcc}.diffrow button.active{background:#dfff42;color:#161b26}.swipe-label{font-size:11px;letter-spacing:.14em;color:#ffffffdc;font-weight:950}
+.peek-card{pointer-events:none}.peek-board{background:#161934ee;position:relative}
+.peek-stage{flex:1;min-height:0;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;text-align:center;background:radial-gradient(circle at 50% 45%,#463e84,transparent 80%),#1c1b34}
+.peek-symbol{width:112px;height:112px;border-radius:26px;background:#dfff42;display:flex;align-items:center;justify-content:center;color:#15162d;font-size:76px;box-shadow:9px 9px 0 #fb527a;transform:rotate(-8deg)}
+.peek-play{font-size:30px;font-weight:1000;letter-spacing:-.055em;line-height:1.05;margin-top:25px;color:white}
+.peek-copy{font-size:13px;color:#e2dff0;margin-top:10px;max-width:250px;line-height:1.5}
+.peek-start{margin-top:22px;border-radius:6px;background:#dfff42;color:#10152b;font-weight:1000;letter-spacing:.05em;padding:12px 21px;font-size:12px}
+.preview-chip{background:#dfff42;color:#182233;border-radius:5px;font-size:10px;font-weight:1000;padding:7px 10px}.peek-bottom{font-weight:950;font-size:11px;letter-spacing:.05em;margin-top:13px;text-align:center}
+@media(max-width:560px){.app{border:0;box-shadow:none}.swipe-viewport{border-radius:0}.swipe-viewport>.feed-main{border-radius:12px}.peek-symbol{width:94px;height:94px;font-size:62px}}
+@media(prefers-reduced-motion:reduce){.swipe-viewport>.feed-main{will-change:auto}}
+
+
+/* Versus arcade: a clearer competitive identity, not emoji artwork. */
+:root{--citrus:#cbff53;--coral:#ff447e}
+.brand{font-weight:1000}.mark{background:#d8ff54;box-shadow:3px 3px 0 #fa5b92}
+.app{background:linear-gradient(150deg,#29234d,#141428)}
+.switch button.active{background:#d6ff5e;color:#181a2a}
+.feed-main{box-shadow:inset 0 0 0 2px #ffffff39,0 5px 0 #0002}
+.vs-arena{position:relative;width:100%;height:100%;min-height:0;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:2px}
+.vs-arena canvas{width:min(100%,344px);height:auto;max-height:calc(100% - 24px);aspect-ratio:344/320;object-fit:contain;background:#151931;border-radius:12px;touch-action:none}
+.vs-badge-row{display:flex;justify-content:space-between;width:100%;font-size:10px;letter-spacing:.1em;font-weight:950;color:white;padding:3px 5px}
+.vs-badge-row span:first-child{color:#ff87b6}.vs-badge-row span:last-child{color:#d2ffa1}
+.vs-result{z-index:9;background:#191b36f6}
+.vs-reflex{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:250px}
+.vs-reflex-score{width:100%;display:flex;justify-content:space-around;font-size:32px;font-weight:1000}
+.vs-reflex-score b:first-child{color:#ff83b2}.vs-reflex-score b:last-child{color:#bdff80}
+.vs-reflex h2{font-size:27px;font-weight:1000;margin:0;letter-spacing:-.05em}.vs-reflex p{font-size:11px;color:#d7d1e9;margin:0}
+.vs-light{width:80px;height:80px;border-radius:50%;background:#f56875;box-shadow:0 0 0 10px #ffffff12,0 0 35px #a3ff6555}
+.vs-reflex-buttons{display:flex;gap:12px;width:100%}.vs-reflex-buttons button{flex:1;min-height:62px;border-radius:12px;border:0;background:#ff72a2;color:#1b1829;font-weight:1000;font-size:12px}.vs-reflex-buttons button+button{background:#c2ff7a}
+.vs-connect{width:100%;max-width:310px;margin:auto;display:flex;flex-direction:column;align-items:center;gap:12px}.vs-turn{font-size:12px;font-weight:1000;letter-spacing:.08em}
+.vs-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;padding:9px;background:#4160ae;border-radius:12px}
+.vs-slot{padding:0;aspect-ratio:1;border:0;border-radius:50%;background:#13182d;display:flex;align-items:center;justify-content:center;min-width:0}
+.vs-slot span{height:90%;width:90%;border-radius:50%;background:#111b39}.vs-slot.owned1 span{background:#ff6d9e}.vs-slot.owned2 span{background:#bfff79}
+@media(max-width:560px){.vs-arena canvas{max-height:calc(100% - 30px)}.vs-reflex-buttons button{font-size:10px}.vs-grid{gap:3px;padding:6px}}
+
+.vs-trail-pads{position:absolute;left:0;bottom:0;width:100%;display:flex;gap:6px;z-index:5;padding:3px 5px;background:#10152fba;justify-content:space-between}
+.vs-trail-pads>div{display:flex;align-items:center;gap:2px}.vs-trail-pads b{font-size:9px;color:#fff}.vs-trail-pads button{height:28px;width:25px;background:#fff3;border:1px solid #fff8;border-radius:5px;color:white;font-weight:950;font-size:13px}
+.vs-trail-pads>div:first-child button{background:#ff6d9e55}.vs-trail-pads>div:last-child button{background:#bdff8055}
+
+
+/* Optimized compositor-only sliding for Mac trackpads and touch devices. */
+.swipe-viewport.in-motion .feed-main{box-shadow:none!important;filter:none!important}
+.swipe-viewport .feed-main{backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(0)}
+.tug-track{width:100%;height:25px;position:relative;border-radius:99px;background:linear-gradient(90deg,#ff719f 0%,#e9e4ff 50%,#bbff7e 100%);box-shadow:inset 0 0 0 2px #ffffff6a}
+.tug-mid{position:absolute;left:50%;height:100%;width:2px;background:#2c2940aa}
+.tug-marker{position:absolute;left:50%;top:-9px;height:42px;width:19px;border:3px solid #292338;background:#fff;border-radius:9px;transform:translateX(-50%);transition:left 65ms linear}
+.mind-panel{padding:10px}.mind-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;width:100%}.mind-choices button{font-size:11px;font-weight:950;border:2px solid #ffffff48;background:#7157a7;color:white;border-radius:13px;min-height:77px;padding:5px}.mind-choices button:active{background:#ceff71;color:#121227}
+
+/* Responsive v1.0: desktop uses its full width, phones retain swipe-first layout. */
+.opponent-options{display:none;align-items:center;gap:6px;padding:0 2px 8px}.versus-mode .opponent-options{display:flex}
+.opponent-options span{font-size:10px;font-weight:950;letter-spacing:.12em;color:#c3c0de;margin-right:5px}
+.opponent-options button{flex:1;border:1px solid #ffffff50;color:#f2eafa;background:#282443;border-radius:9px;padding:8px;font-weight:950;font-size:11px;letter-spacing:.06em}
+.opponent-options button.chosen{background:#caff65;color:#121828;border-color:#caff65}
+@media(min-width:900px){
+ html,body{height:100%;overflow:hidden}
+ .shell{max-width:none;width:100%;height:100svh;min-height:0;padding:14px clamp(15px,3vw,50px);display:flex;justify-content:center;align-items:stretch}
+ .left,.right{display:none}
+ .app{width:min(100%,1500px);max-width:none;min-width:0;grid-column:auto;height:100%;min-height:0;border-radius:19px;box-shadow:0 18px 80px #0008,0 6px 0 #07061b;border:1px solid #ffffff63}
+ .topbar{padding:14px 30px 8px}.brand{font-size:28px}.feed{padding:0 25px}.top-controls{max-width:680px;margin:4px auto 9px;width:100%}
+ .opponent-options{max-width:680px;width:100%;align-self:center}
+ .swipe-viewport{border-radius:16px}
+ .swipe-viewport>.feed-main{display:grid;grid-template-columns:minmax(230px,31%) minmax(0,1fr);grid-template-rows:auto auto minmax(30px,1fr) auto auto auto;column-gap:clamp(12px,3vw,45px);row-gap:10px;align-items:start;padding:clamp(18px,3.4vw,43px)}
+ .feed-main .title-row{grid-column:1;grid-row:1;align-self:start}
+ .feed-main .title{grid-column:1;grid-row:2;font-size:clamp(40px,5vw,80px);line-height:.93;overflow-wrap:anywhere;margin:8px 0}
+ .feed-main .subtitle{grid-column:1;grid-row:3;font-size:clamp(15px,1.4vw,23px);line-height:1.3;max-width:290px}
+ .feed-main .playboard{grid-column:2;grid-row:1/7;align-self:stretch;min-height:0;height:100%;padding:13px}
+ .feed-main .footer-tools{grid-column:1;grid-row:4;display:flex;flex-wrap:wrap}
+ .feed-main .instructions{grid-column:1;grid-row:5;font-size:14px;line-height:1.5}
+ .feed-main .friend-meta{grid-column:1;grid-row:6;font-size:11px;line-height:1.4}
+ .stage{min-height:0;padding:15px}
+ .stage canvas{width:min(100%,630px);height:auto;max-height:100%;object-fit:contain}
+ .vs-arena canvas{width:min(100%,700px);max-height:calc(100% - 26px);height:auto}
+ .stage .center{max-width:650px;margin:auto}.stage .center h3{font-size:clamp(25px,2.6vw,42px)}
+ .gridgame,.choicegrid{max-width:min(500px,95%);max-height:100%}
+ .vs-connect{max-width:460px}.stage .center p{max-width:450px;font-size:15px}
+ .swipe-label{padding:7px}.bottom{padding:8px 15px}
+}
+@media(max-width:899px) and (min-width:561px){.shell{grid-template-columns:1fr;justify-items:center;padding:12px}.app{grid-column:1;width:min(100%,780px);height:calc(100svh - 24px);min-height:0}.left,.right{display:none}}
+@media(max-width:560px){.opponent-options{padding:0 2px 6px}.opponent-options span{font-size:9px}.opponent-options button{font-size:10px;padding:6px}}
+</style>
+</head><body><div class="background"></div>
+<div class="shell">
+<aside class="left"><span class="kicker">THE FEED FIGHTS BACK</span><h1 class="display">SWIPE.<br>PLAY.<br><span>REPEAT.</span></h1><p class="aside-text">20 solo challenges. 20 head-to-head games. Swipe whenever you want, and play alone or face a rival.</p><div class="sidebox"><strong>Made for your hands.</strong><br>Two-finger scroll moves the entire feed. Leave any round instantly, even while playing. Arrow keys work in movement games.</div></aside>
+<main class="app" id="app">
+ <header class="topbar"><div class="brand"><span class="mark">BF</span>battlefeed<span style="color:var(--coral)">.</span></div><div class="counter"><span class="online-dot"></span><span id="totalModes">20 GAMES</span></div></header>
+ <section class="feed" id="feed">
+  <div class="top-controls"><div class="switch" role="group" aria-label="Play mode"><button class="active" id="soloBtn" aria-pressed="true">SOLO</button><button id="versusBtn" aria-pressed="false">VERSUS</button></div><button class="circlebtn" id="friendBtn" title="Friend challenge" aria-label="Friend challenges"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M2.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M17 10v7m-3.5-3.5h7"/></svg></button><button class="circlebtn" id="infoBtn" title="How it works" aria-label="How it works"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 10v7M12 6v2"/></svg></button></div>
+  <div class="opponent-options" id="opponentOptions" role="group" aria-label="Versus opponent"><span>OPPONENT</span><button class="chosen" id="cpuBtn" aria-pressed="true">COMPUTER</button><button id="localBtn" aria-pressed="false">2 PLAYERS</button></div><div class="swipe-viewport" id="swipeViewport" aria-label="Swipe between playable challenges">
+  <article class="feed-main theme-coral" id="gameCard">
+    <div class="title-row"><span class="tiny-label" id="gameNumber">ROUND 01 / 20</span><div class="step-nav"><button id="prevBtn" title="Previous game" aria-label="Previous game">↑</button><button id="nextBtn" title="Next game" aria-label="Next game">↓</button></div></div>
+    <h1 class="title" id="gameTitle">Tap Rush</h1><div class="subtitle" id="gameSubtitle">Can you keep up?</div>
+    <div class="playboard"><div class="mini-hud"><span id="scoreHUD">SCORE 0</span><span id="clockHUD">READY</span></div><div class="stage" id="stage" aria-live="polite"></div></div>
+    <div class="footer-tools"><div class="diffrow" id="diffrow"><button data-diff="normal" class="active">NORMAL</button><button data-diff="hard">HARD</button><button data-diff="nightmare">NIGHTMARE</button></div><button class="circlebtn" id="restartBtn" title="Replay" aria-label="Replay"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4M3 4v6h6"/></svg></button><button class="circlebtn" id="shareBtn" title="Share challenge" aria-label="Share challenge"><svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M13 4l7 7-7 7M20 11H9a5 5 0 0 0-5 5v4"/></svg></button></div>
+    <p class="instructions" id="gameDesc">Tap quickly to hit every target.</p><div class="friend-meta" id="friendMeta">Swipe for the next challenge</div>
+  </article>
+  </div>
+  <div class="swipe-label"><div class="swipe-line"></div><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v11m-4-4 4 4 4-4" stroke="#c6c0df" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>SWIPE ANYTIME<div class="swipe-line"></div></div>
+ </section>
+ <nav class="bottom"><button class="selected" id="feedNav"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 10 12 3l8 7v10H4V10Zm5 10v-7h6v7"/></svg>FEED</button><button id="shuffleNav"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h4c5 0 5 10 10 10h2m-4-3 4 3-4 3M4 17h4c2 0 3-2 4-4M16 4l4 3-4 3m0 0h-2c-2 0-3 2-4 4"/></svg>SHUFFLE</button><button id="statsNav"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m5 16v-7m5 7V8M2 21h20"/></svg>PROFILE</button></nav>
+ <div class="overlay" id="overlay" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><button class="close" id="closeSheet" aria-label="Close">×</button><h2 id="sheetTitle">Friends</h2><div id="sheetBody"></div></div></div>
+</main>
+<aside class="right"><div class="kicker">BATTLE STATS</div><h2>Get good.<br>Then get better.</h2><div class="liststat"><span>Playable challenges</span><b id="sideTotal">20</b></div><div class="liststat"><span>Your wins</span><b id="sideWins">0</b></div><div class="liststat"><span>Rounds played</span><b id="sidePlays">0</b></div><div class="hintpill"><strong>VERSUS MODE</strong><br>20 head-to-head games. Battle the computer or compete with a friend on the same device. Online multiplayer is not live yet.</div></aside>
+</div><div class="toast" id="notice" role="status"></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),stage=$('stage'),app=$('app');
+const SOLO_GAMES=[
+{id:'tap',name:'Tap Rush',category:'REFLEX',sub:'Find the real target. Beat the clock.',desc:'Hit the moving target. Decoys take your time.',theme:'coral',symbol:'●'},
+{id:'maze',name:'Maze Blitz',category:'ARCADE',sub:'One exit. No second chances.',desc:'Find the exit using arrow keys or the on-screen controls.',theme:'violet',symbol:'◇'},
+{id:'memory',name:'Memory Flash',category:'PARTY',sub:'Look once. Remember everything.',desc:'Watch the pattern, then repeat it in order.',theme:'blue',symbol:'▦'},
+{id:'bomb',name:'Bomb Blitz',category:'TIMING',sub:'Defuse it right before the blast.',desc:'Stop the fuse in the tiny safe zone. Too early counts as a miss.',theme:'orange',symbol:'✕'},
+{id:'cups',name:'Cup Chaos',category:'PARTY',sub:'Three cups. One hidden prize.',desc:'Track the prize as the cups switch positions.',theme:'pink',symbol:'◆'},
+{id:'odd',name:'Pixel Hunt',category:'PUZZLE',sub:'One tile is different.',desc:'Spot the almost-matching tile before time runs out.',theme:'mint',symbol:'▣'},
+{id:'reaction',name:'Reaction Trap',category:'TIMING',sub:'Wait for green. Not before.',desc:'Hold back until the signal changes, then react fast.',theme:'lime',symbol:'◎'},
+{id:'laser',name:'Laser Lanes',category:'ARCADE',sub:'Move fast. Stay in one piece.',desc:'Use left and right arrows or the buttons to dodge lasers.',theme:'coral',symbol:'▲'},
+{id:'ghost',name:'Ghost Hunt',category:'ARCADE',sub:'Catch it before it disappears.',desc:'Find the moving target before it teleports.',theme:'violet',symbol:'◉'},
+{id:'dodge',name:'Dodge Drift',category:'ARCADE',sub:'Everything is falling.',desc:'Move your ship with the trackpad, touch, or arrow keys.',theme:'blue',symbol:'▲'},
+{id:'pop',name:'Pop Party',category:'PARTY',sub:'Pop the good ones. Avoid the bad.',desc:'Hit bright balloons and avoid dangerous decoys.',theme:'pink',symbol:'○'},
+{id:'risk',name:'Risky Tiles',category:'PUZZLE',sub:'Trust your memory.',desc:'Remember the dangerous squares and pick safe tiles.',theme:'orange',symbol:'▦'},
+{id:'chain',name:'Chain Pop',category:'PARTY',sub:'One tap. Massive chaos.',desc:'Start the largest connected chain reaction possible.',theme:'mint',symbol:'◉'},
+{id:'tower',name:'Tower Stack',category:'ARCADE',sub:'How high can you go?',desc:'Drop moving platforms onto the tower. Keep them aligned.',theme:'peach',symbol:'▰'},
+{id:'rhythm',name:'Beat Drop',category:'TIMING',sub:'Timing is everything.',desc:'Hit the target zone as the marker passes through.',theme:'violet',symbol:'▥'},
+{id:'emoji',name:'Odd One Out',category:'PUZZLE',sub:'Find the fake in the crowd.',desc:'Spot the symbol that does not belong.',theme:'lime',symbol:'◇'},
+{id:'coins',name:'Coin Catch',category:'ARCADE',sub:'Grab everything. Dodge danger.',desc:'Catch falling prizes while avoiding the hazards.',theme:'orange',symbol:'●'},
+{id:'glitch',name:'Glitch Grab',category:'REFLEX',sub:'Only one is real.',desc:'Hit the real prize before it jumps to a new position.',theme:'blue',symbol:'◆'},
+{id:'orbit',name:'Orbit Shot',category:'TIMING',sub:'Fire when the marker hits the zone.',desc:'Time your shot as the orbiting ball crosses the highlighted target.',theme:'pink',symbol:'◎'},
+{id:'switch',name:'Switch Up',category:'PARTY',sub:'Stay on the safe side.',desc:'Move to the matching side before the colors change again.',theme:'mint',symbol:'◧'}
+];
+let GAMES=SOLO_GAMES;
+const DIFF=['normal','hard','nightmare'];let idx=0,difficulty='normal',phase='idle',tasks=[],rafs=new Set(),keyHandler=null,state={},session=0,noticeTimer=null,gameMode='solo',computerMode=true,botTick=null,versusTurn=1,versusFirst=null,challengeTarget=null,currentSeed=1,activeSeed=1,lastSwipe=0,gestureStart=null;
+const defaults={wins:0,plays:0,best:{},conquered:{}};let progress;
+try{progress={...defaults,...(JSON.parse(localStorage.getItem('battlefeed-v05')||'null')||{})}}catch{progress={...defaults}};
+let gameCount=GAMES.length;
+$('totalModes').textContent=gameCount+' GAMES';$('sideTotal').textContent=gameCount;
+function persist(){try{localStorage.setItem('battlefeed-v05',JSON.stringify(progress))}catch{}refreshStats()}
+function refreshStats(){$('sideWins').textContent=progress.wins||0;$('sidePlays').textContent=progress.plays||0}
+function toast(s){const n=$('notice');n.textContent=s;n.classList.add('show');clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>n.classList.remove('show'),2200)}
+function rng(seed){let n=seed>>>0;return()=>{n^=n<<13;n^=n>>>17;n^=n<<5;return(n>>>0)/4294967296}}let random=rng(123);
+function rand(min,max){return Math.floor(random()*(max-min+1))+min}
+function shuffled(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+const level=()=>DIFF.indexOf(difficulty);
+function reset(){botTick=null;vsHeld?.clear();vsPointers?.clear();clearInterval(state.timer);tasks.forEach(clearTimeout);tasks=[];rafs.forEach(cancelAnimationFrame);rafs.clear();session++;stage.onclick=null;stage.onpointermove=null;stage.onpointerdown=null;stage.onpointerup=null;stage.innerHTML='';keyHandler=null;phase='idle';state={score:0,time:0}}
+function later(fn,ms){const my=session;const id=setTimeout(()=>{const i=tasks.indexOf(id);if(i>=0)tasks.splice(i,1);if(session===my)fn()},ms);tasks.push(id);return id}
+function frame(fn){const my=session;const id=requestAnimationFrame(t=>{rafs.delete(id);if(session===my){if(gameMode==='versus'&&computerMode&&botTick&&phase==='playing')botTick(t);fn(t)}});rafs.add(id)}
+function clock(sec,end){state.time=sec;hud();const my=session;state.timer=setInterval(()=>{if(session!==my||phase!=='playing')return;state.time--;hud();if(state.time<=0){clearInterval(state.timer);end?end():finish(false,'Out of time. Try again.')}},1000)}
+function hud(){$('scoreHUD').textContent=(state.scoreLabel||'SCORE').toUpperCase()+'  '+(state.score||0);$('clockHUD').textContent=phase==='idle'?'READY':(state.time?state.time+'s':'0s')}
+function score(n){state.score=n;hud()}
+function newSeed(){return Math.floor(Math.random()*4000000000)||1}
+const CPU_GUIDES={
+ vs_hockey:'Move your pink paddle with WASD, or drag it on the lower half.',
+ vs_pong:'Move your pink paddle with W/S, or drag it on the left.',
+ vs_trails:'Steer the pink trail using WASD. Avoid walls and trails.',
+ vs_sumo:'Move with WASD and dash with F. Knock the CPU out of the ring.',
+ vs_coins:'Use WASD or drag to collect more coins than the computer.',
+ vs_paint:'Move with WASD to claim more squares than the computer.',
+ vs_laser:'Move with WASD. Your laser fires automatically. Dodge the CPU.',
+ vs_draw:'Press F or the left button when DRAW appears. Do not fire early.',
+ vs_connect:'Tap a column to drop your pink disc. Connect four before the CPU.',
+ vs_catch:'Move left and right with A/D or drag the pink catcher.',
+ vs_volley:'Use A/D to move and F to volley. Keep the ball off your floor.',
+ vs_tug:'Press F quickly or tap the left button. Pull the marker to pink.',
+ vs_flag:'Use WASD or drag to capture the crystal and return to your base.',
+ vs_meteor:'Dodge falling meteors with A/D or drag your pink ship.',
+ vs_pop:'Tap pink circles on the left. Yellow circles lose points.',
+ vs_bricks:'Move your pink paddle with A/D and clear bricks first.',
+ vs_boxes:'Tap a line between dots. Complete boxes to earn points.',
+ vs_mind:'Choose rock, paper, or scissors and try to outsmart the computer.',
+ vs_cannon:'Aim with W/S and fire with F. Hit the computer turret.',
+ vs_tag:'Move with WASD or drag to catch or escape the computer.'
+};
+function howToPlay(g){return gameMode==='versus'&&computerMode?(CPU_GUIDES[g.id]||g.desc):g.desc}
+function updateCard(){const g=GAMES[idx];$('gameCard').className='feed-main theme-'+g.theme;$('gameTitle').textContent=g.name;$('gameSubtitle').textContent=g.sub;$('gameNumber').textContent='ROUND '+String(idx+1).padStart(2,'0')+' / '+gameCount+'  ·  '+g.category;$('gameDesc').textContent=howToPlay(g);$('friendMeta').textContent=challengeTarget?'FRIEND CHALLENGE: BEAT '+challengeTarget.score+' POINTS':gameMode==='versus'?(computerMode?'LIVE DUEL · YOU VS COMPUTER':'LIVE DUEL · TWO PLAYERS · ONE DEVICE'):'SWIPE ANYTIME · EVEN MID-GAME';document.querySelectorAll('[data-diff]').forEach(el=>el.classList.toggle('active',el.dataset.diff===difficulty));$('soloBtn').classList.toggle('active',gameMode==='solo');$('versusBtn').classList.toggle('active',gameMode==='versus');$('soloBtn').setAttribute('aria-pressed',String(gameMode==='solo'));$('versusBtn').setAttribute('aria-pressed',String(gameMode==='versus'));app.classList.toggle('versus-mode',gameMode==='versus');$('cpuBtn').classList.toggle('chosen',computerMode);$('localBtn').classList.toggle('chosen',!computerMode);$('cpuBtn').setAttribute('aria-pressed',String(computerMode));$('localBtn').setAttribute('aria-pressed',String(!computerMode));}
+function goGame(index,keepSeed=false){reset();idx=(index+GAMES.length)%GAMES.length;versusTurn=1;versusFirst=null;challengeTarget=null;if(!keepSeed)currentSeed=newSeed();updateCard();preview();hud()}
+function preview(){const g=GAMES[idx],who='',ch=challengeTarget?'BEAT THEIR SCORE':gameMode==='versus'?(computerMode?'PLAY COMPUTER':'START 2 PLAYER MATCH'):'PLAY NOW';stage.innerHTML=`<div class="center"><div class="starticon">${g.symbol}</div><h3>${who}${g.name}</h3><p>${challengeTarget?'A friend scored '+challengeTarget.score+'. Can you beat it?':howToPlay(g)}</p><button class="btn main" id="startGameButton">${ch}</button></div>`;$('startGameButton').onclick=startGame}
+function nextGame(){animatedNavigation(1)}function prevGame(){animatedNavigation(-1)}function randomGame(){animatedNavigation(1, Math.floor(Math.random()*GAMES.length))}
+function startGame(){reset();random=rng(currentSeed);phase='playing';progress.plays++;persist();if(gameMode==='versus'){const duel=VS_MODES[GAMES[idx].id];if(!duel){vsWin(0,'Duel unavailable');return}duel();return}const fn=MODES[GAMES[idx].id];if(!fn){finish(false,'Game unavailable');return}fn();hud()}
+function resultHtml(title,msg,meta,actions){stage.insertAdjacentHTML('beforeend',`<div class="result" role="dialog" aria-label="Round result"><div class="big">${phase==='won'?'W':'X'}</div><div class="roundmeta">${meta}</div><h3>${title}</h3><p>${msg}</p><div class="buttons">${actions}</div></div>`)}
+function finish(won,msg){if(phase!=='playing')return;const ended={won,score:state.score||0,time:state.time};clearInterval(state.timer);tasks.forEach(clearTimeout);tasks=[];rafs.forEach(cancelAnimationFrame);rafs.clear();session++;phase=won?'won':'lost';if(won){progress.wins++;progress.conquered[GAMES[idx].id]=true;const k=GAMES[idx].id+'-'+difficulty;progress.best[k]=Math.max(progress.best[k]||0,ended.score);persist()}
+if(gameMode==='versus'){
+ if(versusTurn===1){versusFirst=ended;resultHtml('Pass it over','Player 1 scored '+ended.score+'. Player 2 gets the exact same challenge.','PLAYER 1 FINISHED','<button class="btn main" id="secondTurn">PLAYER 2 START</button><button class="btn" id="changeMode">CANCEL</button>');$('secondTurn').onclick=()=>{versusTurn=2;reset();updateCard();stage.innerHTML='<div class="center"><div class="starticon">2</div><h3>Player 2, ready?</h3><p>Same game. Same random setup. Beat the first player.</p><button class="btn main" id="beginSecond">START ROUND</button></div>';$('beginSecond').onclick=startGame};$('changeMode').onclick=()=>{versusTurn=1;versusFirst=null;goGame(idx)};return}
+ const first=versusFirst;const rank=(r)=>r.won?100000+r.score:r.score;const result=rank(ended)>rank(first)?'PLAYER 2 WINS':rank(ended)<rank(first)?'PLAYER 1 WINS':'IT’S A TIE';resultHtml(result,`Player 1: ${first.score} ${first.won?'(clear)':''} · Player 2: ${ended.score} ${ended.won?'(clear)':''}`, 'MATCH COMPLETE','<button class="btn white" id="againMatch">REMATCH</button><button class="btn main" id="nextMatch">NEXT GAME</button>');$('againMatch').onclick=()=>{versusTurn=1;versusFirst=null;goGame(idx)};$('nextMatch').onclick=nextGame;return
+}
+ const outcome=challengeTarget?(rankScore(ended)>rankScore(challengeTarget)?'FRIEND BEATEN':rankScore(ended)===rankScore(challengeTarget)?'TIED YOUR FRIEND':'FRIEND WINS'):(won?'CHALLENGE CLEARED':'ROUND OVER');const body=challengeTarget?`You: ${ended.score} · Friend: ${challengeTarget.score}. ${msg||''}`:msg||'Try again and beat your best.';resultHtml(outcome,body,`${ended.score} POINTS · ${difficulty.toUpperCase()}`,'<button class="btn white" id="replayResult">REPLAY</button><button class="btn main" id="nextResult">NEXT GAME</button>');$('replayResult').onclick=()=>{if(!challengeTarget)currentSeed=newSeed();startGame()};$('nextResult').onclick=nextGame;
+}
+function rankScore(x){return(x.won?100000:0)+(x.score||0)}
+function canvasSetup(){stage.innerHTML='<canvas width="344" height="295" aria-label="Game canvas"></canvas><div class="hint" id="canvasHint">MOVE WITH POINTER OR ARROW KEYS</div>';return stage.querySelector('canvas')}
+const MODES={};
+// 1. Tap Rush: moving targets and genuine decoys.
+MODES.tap=function(){const l=level(),goal=[17,23,30][l],times=[17,15,14][l],size=[43,35,29][l];state.scoreLabel='Hits';clock(times);let serial=0;function spawn(){if(phase!=='playing')return;serial++;const r=serial;const x=rand(7,77),y=rand(12,77);let html=`<button aria-label="Hit the star" data-hit="1" style="position:absolute;left:${x}%;top:${y}%;border:0;background:linear-gradient(#fff3b0,#ffad48);border-radius:50%;width:${size}px;height:${size}px;font-size:19px;box-shadow:0 0 0 8px #ffc16b1c;color:#7e2a58">●</button>`;for(let i=0;i<[1,2,3][l];i++)html+=`<button data-decoy="1" aria-label="Decoy" style="position:absolute;left:${rand(5,80)}%;top:${rand(10,76)}%;width:34px;height:34px;border-radius:50%;border:2px solid #ff92aa73;background:#713452;color:white">×</button>`;stage.innerHTML=html;later(()=>{if(phase==='playing'&&serial===r)spawn()},[1150,880,680][l])}stage.onclick=e=>{if(e.target.closest('[data-decoy]')){state.time=Math.max(1,state.time-3);hud();toast('Bomb! −3 seconds');return}if(!e.target.closest('[data-hit]'))return;score(state.score+1);if(state.score>=goal)finish(true,`You caught ${goal} stars!`);else spawn()};spawn()};
+// 2. Maze Blitz: generated maze, arrows and keyboard.
+MODES.maze=function(){const l=level(),size=[11,13,15][l];state.scoreLabel='Steps';let m=Array.from({length:size},()=>Array(size).fill(1));function carve(y,x){m[y][x]=0;for(const [dy,dx] of shuffled([[2,0],[-2,0],[0,2],[0,-2]])){const ny=y+dy,nx=x+dx;if(ny>0&&ny<size-1&&nx>0&&nx<size-1&&m[ny][nx]){m[y+dy/2][x+dx/2]=0;carve(ny,nx)}}}carve(1,1);const pos={y:1,x:1},end={y:size-2,x:size-2};m[end.y][end.x]=0;clock([45,42,38][l]);stage.innerHTML='<div id="mazeGrid" class="gridgame" style="width:242px"></div><div class="controls"><button class="up" data-dir="up">↑</button><button class="left" data-dir="left">←</button><button class="down" data-dir="down">↓</button><button class="right" data-dir="right">→</button></div>';function draw(){const grid=stage.querySelector('#mazeGrid');grid.style.gridTemplateColumns=`repeat(${size},1fr)`;grid.innerHTML=m.flatMap((row,y)=>row.map((v,x)=>{let type=v?' wall':pos.y===y&&pos.x===x?' player':end.y===y&&end.x===x?' goal':'';if(l===2&&Math.abs(pos.y-y)+Math.abs(pos.x-x)>4&&!(end.y===y&&end.x===x))type=' wall';return `<div class="cell${type}">${pos.y===y&&pos.x===x?'●':end.y===y&&end.x===x?'⚑':''}</div>`})).join('')}function move(dir){const d={up:[-1,0],down:[1,0],left:[0,-1],right:[0,1]}[dir];if(!d)return;const ny=pos.y+d[0],nx=pos.x+d[1];if(ny<0||nx<0||ny>=size||nx>=size||m[ny][nx])return;pos.y=ny;pos.x=nx;score(state.score+1);draw();if(ny===end.y&&nx===end.x)finish(true,`Escaped in ${state.score} steps!`)}stage.onclick=e=>{const b=e.target.closest('[data-dir]');if(b)move(b.dataset.dir)};keyHandler=e=>{if(e.key.startsWith('Arrow')){e.preventDefault();move(e.key.slice(5).toLowerCase())}};draw()};
+// 3. Memory Flash.
+MODES.memory=function(){const l=level(),goal=[6,8,10][l],sequence=Array.from({length:goal},()=>rand(0,8));let shown=true,entered=0;state.scoreLabel='Correct';stage.innerHTML='<div class="gridgame" style="grid-template-columns:repeat(3,1fr);max-width:225px" id="memoryGrid">'+Array.from({length:9},(_,i)=>`<button data-cell="${i}" class="cell memorycell" style="width:65px;height:65px"></button>`).join('')+'</div><div class="hint" id="memoryHint">Watch the pattern...</div>';clock([32,28,26][l]);const tiles=[...stage.querySelectorAll('[data-cell]')],gap=[510,405,330][l],on=[310,240,190][l];sequence.forEach((n,i)=>{later(()=>tiles[n]?.classList.add('lit'),450+i*gap);later(()=>tiles[n]?.classList.remove('lit'),450+i*gap+on)});later(()=>{shown=false;stage.querySelector('#memoryHint').textContent='Your turn! Repeat the pattern.'},550+goal*gap);stage.onclick=e=>{const b=e.target.closest('[data-cell]');if(!b||shown)return;const n=Number(b.dataset.cell);if(n!==sequence[entered]){finish(false,`You remembered ${entered} of ${goal} tiles.`);return}b.classList.add('lit');later(()=>b.classList.remove('lit'),145);entered++;score(entered);if(entered===goal)finish(true,`Perfect! ${goal} flashes remembered.`)}};
+// 4. Stroop color challenge.
+
+// 5. Math Storm.
+
+// 6. Pixel Hunt.
+MODES.odd=function(){const l=level(),goal=[10,12,15][l];state.scoreLabel='Found';clock([30,27,24][l]);let oddIndex;function draw(){const size=[6,7,8][l],n=size*size;oddIndex=rand(0,n-1);const hue=rand(0,360),sat=rand(55,83),light=rand(40,63),delta=Math.max(2,14-l*4-Math.floor(state.score/3));stage.innerHTML=`<div class="hint">Find the slightly different square · Round ${state.score+1}/${goal}</div><div class="gridgame" style="grid-template-columns:repeat(${size},1fr);max-width:280px">${Array.from({length:n},(_,i)=>`<button class="cell" data-square="${i}" style="background:hsl(${hue} ${sat}% ${light+(i===oddIndex?delta:0)}%)"></button>`).join('')}</div>`}stage.onclick=e=>{let b=e.target.closest('[data-square]');if(!b)return;if(Number(b.dataset.square)===oddIndex){score(state.score+1);if(state.score>=goal){finish(true,'Eagle eyes!');return}}else{state.time=Math.max(1,state.time-4);toast('Not that one! −4 seconds')}draw();hud()};draw()};
+// 7. Reaction Trap.
+MODES.reaction=function(){const l=level(),goal=[5,6,7][l];state.scoreLabel='Signals';let ready=false,signal=0,sum=0;clock([35,36,37][l]);function cue(){ready=false;stage.innerHTML='<button id="reactionBtn" style="width:100%;height:100%;border:0;border-radius:17px;background:#923b69;color:#fff;font-size:28px;font-weight:950">WAIT... ●<br><span style="font-size:13px">Do not tap yet</span></button>';later(()=>{ready=true;signal=performance.now();const el=stage.querySelector('#reactionBtn');if(el){el.style.background='#158c71';el.innerHTML='TAP NOW! ●'}},rand(900,2400)+l*200)}stage.onclick=e=>{if(!e.target.closest('#reactionBtn'))return;if(!ready){finish(false,'Too soon! You tapped before green.');return}const ms=Math.round(performance.now()-signal);sum+=ms;score(state.score+1);toast(`${ms} ms reaction`);if(state.score>=goal){const avg=Math.round(sum/goal);finish(avg<=[380,320,270][l],`Average reaction: ${avg} ms. Target: ${[380,320,270][l]} ms.`);return}cue()};cue()};
+// 8. Number Rush.
+
+// 9. Ghost Hunt.
+MODES.ghost=function(){const l=level(),goal=[18,22,26][l];state.scoreLabel='Caught';let ghost=rand(0,8),serial=0;clock([23,22,21][l]);function draw(){stage.innerHTML=`<div class="hint">Catch ${goal} ghosts before the clock runs out!</div><div class="gridgame" style="grid-template-columns:repeat(3,1fr);max-width:265px">${Array.from({length:9},(_,i)=>`<button class="cell" style="background:${i===ghost?'#7859a2':'#36264d'};font-size:29px" data-hole="${i}">${i===ghost?'○':'✦'}</button>`).join('')}</div>`}function moveGhost(){if(phase!=='playing')return;ghost=rand(0,8);serial++;draw();const n=serial;later(()=>{if(phase==='playing'&&n===serial)moveGhost()},[590,480,390][l])}stage.onclick=e=>{const b=e.target.closest('[data-hole]');if(!b)return;if(Number(b.dataset.hole)===ghost){score(state.score+1);if(state.score>=goal){finish(true,'Ghost hunter champion!');return}moveGhost()}else{state.time=Math.max(1,state.time-2);hud()}};moveGhost()};
+// 10. Dodge Drift. No external libraries.
+MODES.dodge=function(){const l=level(),c=canvasSetup(),ctx=c.getContext('2d');let shipX=172,hp=[2,2,1][l],rocks=[],last=performance.now(),spawnTime=0;state.scoreLabel='Dodged';const total=[25,28,30][l];clock(total,()=>finish(true,`Survived ${total} seconds!`));function draw(t){if(phase!=='playing')return;let dt=Math.min(45,t-last);last=t;spawnTime+=dt;if(spawnTime>[390,320,235][l]){spawnTime=0;rocks.push({x:rand(18,326),y:-15,r:rand(11,17),vy:[3.4,4.2,5.1][l]+random()})}ctx.clearRect(0,0,344,295);ctx.fillStyle='#18132e';ctx.fillRect(0,0,344,295);ctx.strokeStyle='#ffffff10';for(let i=0;i<344;i+=35){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,295);ctx.stroke()}ctx.font='27px system-ui';ctx.textAlign='center';ctx.fillText('▲',shipX,267);for(const rock of rocks){rock.y+=rock.vy*dt/16.7;ctx.fillText('*',rock.x,rock.y);if(Math.abs(rock.y-259)<17&&Math.abs(rock.x-shipX)<23){rock.y=999;hp--;toast('Meteor hit! '+hp+' lives left');if(hp<=0){finish(false,'Your ship was destroyed.');return}}}const old=rocks.length;rocks=rocks.filter(x=>x.y<310);if(old>rocks.length){score(state.score+old-rocks.length)}ctx.fillStyle='#fff';ctx.textAlign='left';ctx.font='bold 15px system-ui';ctx.fillText('♥ '+hp,12,22);frame(draw)}function pointer(e){const r=c.getBoundingClientRect();shipX=Math.min(328,Math.max(16,(e.clientX-r.left)*344/r.width))}c.addEventListener('pointermove',pointer);c.addEventListener('pointerdown',pointer);keyHandler=e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();shipX=Math.max(16,Math.min(328,shipX+(e.key==='ArrowLeft'?-26:26)))}};frame(draw)};
+// 11. Word Warp.
+
+// 12. Slide Puzzle.
+
+// 13. Safe Cracker, mastermind with unique digits.
+
+// 14. Tower Stack.
+MODES.tower=function(){const l=level(),goal=[9,11,13][l],c=canvasSetup(),ctx=c.getContext('2d');let blocks=[{x:95,w:154,y:274}],x=0,w=154,dir=1,last=performance.now(),speed=[.27,.34,.41][l];state.scoreLabel='Layers';clock([55,50,45][l]);stage.querySelector('#canvasHint').textContent='Tap anywhere on the tower to DROP';function draw(t){if(phase!=='playing')return;const dt=Math.min(60,t-last);last=t;x+=dir*speed*dt;if(x<0){x=0;dir=1}if(x+w>344){x=344-w;dir=-1}ctx.clearRect(0,0,344,295);ctx.fillStyle='#17132c';ctx.fillRect(0,0,344,295);blocks.forEach((b,i)=>{ctx.fillStyle=`hsl(${260+i*23},85%,${57+i*2}%)`;ctx.fillRect(b.x,b.y,b.w,22)});ctx.fillStyle='#ff8cba';ctx.fillRect(x,274-blocks.length*22,w,22);ctx.fillStyle='#ddc9f8';ctx.font='12px system-ui';ctx.fillText('Drop when aligned with the platform below',8,18);frame(draw)}function drop(){if(phase!=='playing')return;const top=blocks[blocks.length-1],overlapStart=Math.max(x,top.x),overlapEnd=Math.min(x+w,top.x+top.w),newW=overlapEnd-overlapStart;if(newW<=8){finish(false,`Tower collapsed after ${state.score} layers.`);return}const y=274-blocks.length*22;blocks.push({x:overlapStart,w:newW,y});score(state.score+1);if(state.score>=goal){finish(true,`Stacked ${goal} layers!`);return}x=dir===1?0:344-newW;w=newW;speed+=.014}c.addEventListener('pointerdown',drop);keyHandler=e=>{if(e.code==='Space'){e.preventDefault();drop()}};frame(draw)};
+// 15. Beat Drop.
+MODES.rhythm=function(){const l=level(),goal=[12,15,18][l],c=canvasSetup(),ctx=c.getContext('2d');let x=0,last=performance.now(),dir=1,miss=0,speed=[.35,.43,.54][l];const tolerance=[22,17,13][l];state.scoreLabel='Perfect hits';clock([36,32,30][l]);stage.querySelector('#canvasHint').textContent='Tap when the orb reaches the center ◆';function draw(t){if(phase!=='playing')return;const dt=Math.min(55,t-last);last=t;x+=dir*speed*dt;if(x<14){x=14;dir=1}if(x>330){x=330;dir=-1}ctx.clearRect(0,0,344,295);ctx.fillStyle='#19132f';ctx.fillRect(0,0,344,295);ctx.fillStyle='#6ee5df66';ctx.fillRect(172-tolerance,130,tolerance*2,36);ctx.strokeStyle='#ffffff60';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(14,148);ctx.lineTo(330,148);ctx.stroke();ctx.font='32px system-ui';ctx.textAlign='center';ctx.fillText('●',x,158);ctx.fillStyle='#fff';ctx.font='bold 17px system-ui';ctx.fillText('TIMING IS EVERYTHING',172,55);ctx.font='13px system-ui';ctx.fillText(`Misses ${miss}/${[4,3,2][l]}`,172,249);frame(draw)}function hit(){if(phase!=='playing')return;if(Math.abs(x-172)<=tolerance){score(state.score+1);toast('PERFECT! ◆');if(state.score>=goal){finish(true,'You have perfect rhythm!');return}speed+=.013}else{miss++;toast('Missed the beat!');if(miss>=[4,3,2][l])finish(false,'Too many missed beats.')}}c.addEventListener('pointerdown',hit);keyHandler=e=>{if(e.code==='Space'){e.preventDefault();hit()}};frame(draw)};
+// 16. Emoji imposter.
+MODES.emoji=function(){const l=level(),goal=[10,12,15][l],pairs=[['▲','△'],['◆','◇'],['○','●'],['△','▲'],['■','□'],['◈','◇'],['◉','○'],['▰','▱'],['◇','□'],['■','✕'],['◆','◈']];state.scoreLabel='Caught';clock([34,31,29][l]);let odd;function draw(){const size=[7,7,8][l],n=size*size,p=pairs[rand(0,pairs.length-1)];odd=rand(0,n-1);stage.innerHTML=`<div class="hint">Find the one different symbol. Round ${state.score+1}/${goal}</div><div class="gridgame" style="grid-template-columns:repeat(${size},1fr);max-width:285px;gap:3px">${Array.from({length:n},(_,i)=>`<button class="cell" data-emoji="${i}" style="font-size:${size===7?20:25}px;background:#493668">${i===odd?p[1]:p[0]}</button>`).join('')}</div>`}stage.onclick=e=>{const b=e.target.closest('[data-emoji]');if(!b)return;if(Number(b.dataset.emoji)===odd){score(state.score+1);if(state.score>=goal){finish(true,'Imposter found every time!');return}}else{state.time=Math.max(1,state.time-3);toast('Wrong symbol! −3 seconds')}draw();hud()};draw()};
+// 17. Coin Catch.
+MODES.coins=function(){const l=level(),goal=[31,36,43][l],c=canvasSetup(),ctx=c.getContext('2d');let basketX=172,items=[],last=performance.now(),spawnTime=0,hp=[2,2,1][l];state.scoreLabel='Coins';clock([39,34,30][l]);function draw(t){if(phase!=='playing')return;const dt=Math.min(45,t-last);last=t;spawnTime+=dt;if(spawnTime>[400,340,280][l]){spawnTime=0;items.push({x:rand(15,329),y:-15,bomb:random()<[.2,.28,.36][l],vy:[3.7,4.5,5.3][l]})}ctx.clearRect(0,0,344,295);ctx.fillStyle='#17112c';ctx.fillRect(0,0,344,295);ctx.font='27px system-ui';ctx.textAlign='center';ctx.fillText('▭',basketX,269);for(const it of items){it.y+=it.vy*dt/16.7;ctx.fillText(it.bomb?'×':'●',it.x,it.y);if(it.y>244&&it.y<273&&Math.abs(it.x-basketX)<26){it.y=999;if(it.bomb){hp--;toast('Bomb! '+hp+' lives left');if(hp<=0){finish(false,'The basket exploded.');return}}else{score(state.score+1);if(state.score>=goal){finish(true,`Collected ${goal} coins!`);return}}}}items=items.filter(i=>i.y<315);ctx.textAlign='left';ctx.fillStyle='white';ctx.font='bold 14px system-ui';ctx.fillText('♥ '+hp,11,23);frame(draw)}function move(e){const r=c.getBoundingClientRect();basketX=Math.min(328,Math.max(16,(e.clientX-r.left)*344/r.width))}c.addEventListener('pointermove',move);c.addEventListener('pointerdown',move);keyHandler=e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();basketX=Math.max(16,Math.min(328,basketX+(e.key==='ArrowLeft'?-27:27)))}};frame(draw)};
+// 18. Lights Out.
+
+
+// Bomb Blitz: multi-round countdown timing. Clicking too early or missing the fuse costs a life.
+MODES.bomb=function(){const l=level(),goal=[5,6,8][l],windowSec=[.50,.34,.22][l];let lives=[2,2,1][l],fuse=0,start=0,active=false,round=0;state.scoreLabel='Defused';clock([40,42,45][l]);stage.innerHTML='<div class="center"><div class="starticon" id="bombFace">×</div><h3 id="bombText">WATCH THE FUSE</h3><div style="width:245px;background:#322449;height:12px;border-radius:20px;overflow:hidden"><div id="bombBar" style="background:linear-gradient(90deg,#ff517d,#ffd05b);height:100%;width:100%"></div></div><p id="bombInfo">Click only in the final half-second!</p><button id="bombDefuse" class="btn main" style="width:200px;padding:18px">x DEFUSE</button><p id="bombLife">♥♥</p></div>';
+const face=stage.querySelector('#bombFace'),bar=stage.querySelector('#bombBar'),info=stage.querySelector('#bombInfo'),label=stage.querySelector('#bombText'),life=stage.querySelector('#bombLife');function roundStart(){round++;fuse=rand(2500,4100);start=performance.now();active=true;label.textContent=`BOMB ${round} / ${goal}`;face.textContent='×';info.textContent='Wait until the final flash';life.textContent='♥'.repeat(lives)}function fail(msg){lives--;active=false;face.textContent='*';toast(msg);life.textContent='♥'.repeat(lives);if(lives<=0){finish(false,'The bomb exploded. Try a later defuse!');return}later(roundStart,500)}function draw(t){if(phase!=='playing')return;if(active){const remain=fuse-(t-start);bar.style.width=Math.max(0,remain/fuse*100)+'%';if(remain<windowSec*1000)face.textContent='!';else face.textContent='×';info.textContent=remain>0?`FUSE: ${(remain/1000).toFixed(2)}s · SAFE ZONE: ${windowSec.toFixed(2)}s`:'BOOM';if(remain<=0)fail('Too late!')}frame(draw)}stage.onclick=e=>{if(!e.target.closest('#bombDefuse')||!active)return;const remain=fuse-(performance.now()-start);if(remain<=0){fail('Too late!');return}if(remain>windowSec*1000){fail('Too early!');return}active=false;score(state.score+1);face.textContent='OK';toast('CLUTCH DEFUSE!');if(state.score>=goal){finish(true,`${goal} bombs defused!`);return}later(roundStart,440)};roundStart();frame(draw)};
+// Cup Chaos: real visible swaps of randomized cups.
+MODES.cups=function(){const l=level(),count=[3,4,5][l],goal=[4,5,6][l],swaps=[5,7,9][l];state.scoreLabel='Correct';clock([49,51,57][l]);let prize=0,order=[],selecting=false,round=0;function render(){stage.innerHTML='<div class="center" style="width:100%;padding:8px"><h3 id="cupMessage">Watch the crown!</h3><p id="cupRound">Round 1</p><div id="cupTray" style="width:100%;height:185px;position:relative;margin:4px auto"></div><p id="cupHint">Follow the glowing crown</p></div>';const tray=stage.querySelector('#cupTray');for(let i=0;i<count;i++){const b=document.createElement('button');b.type='button';b.dataset.cup=String(i);b.style.cssText=`position:absolute;top:48px;left:${(i+.5)*100/count}%;transform:translateX(-50%);transition:left ${[340,280,240][l]}ms ease;border:1px solid #ffffff50;border-radius:19px;background:linear-gradient(#7959c1,#49316e);width:${count===5?48:count===4?59:72}px;height:86px;font-size:36px`;b.textContent=i===prize?'◆':'▰';tray.append(b)}}function startRound(){round++;selecting=false;prize=rand(0,count-1);order=Array.from({length:count},(_,i)=>i);render();stage.querySelector('#cupRound').textContent=`Round ${round} / ${goal}`;later(()=>{for(const b of stage.querySelectorAll('[data-cup]'))b.textContent='▰'},950);for(let k=0;k<swaps;k++)later(()=>{if(phase!=='playing')return;let a=rand(0,count-1),b=(a+rand(1,count-1))%count;[order[a],order[b]]=[order[b],order[a]];stage.querySelectorAll('[data-cup]').forEach(el=>el.style.left=((order.indexOf(Number(el.dataset.cup))+.5)*100/count)+'%')},1200+k*[390,315,270][l]);later(()=>{selecting=true;stage.querySelector('#cupMessage').textContent='WHERE IS THE CROWN?';stage.querySelector('#cupHint').textContent='Pick a cup now!'},1200+swaps*[390,315,270][l]+250)}stage.onclick=e=>{const b=e.target.closest('[data-cup]');if(!b||!selecting)return;selecting=false;const chosen=Number(b.dataset.cup);if(chosen===prize){score(state.score+1);toast('YOU FOUND IT! ◆');if(state.score>=goal){finish(true,`${goal} crowns tracked without a miss!`);return}later(startRound,420)}else finish(false,'Wrong cup! The crown was under another one.')};startRound()};
+// Laser Lanes: button and arrow-key controlled three-lane arcade survival.
+MODES.laser=function(){const l=level(),c=canvasSetup(),ctx=c.getContext('2d'),duration=[24,26,29][l];state.scoreLabel='Dodges';let lane=1,lives=[2,2,1][l],lasers=[],last=performance.now(),spawn=0,elapsed=0;stage.querySelector('#canvasHint').innerHTML='<div class="buttons" style="justify-content:center"><button class="btn" data-laser="left">◀ LEFT</button><button class="btn" data-laser="right">RIGHT ▶</button></div>';clock(duration,()=>finish(true,'YOU SURVIVED THE LASER STORM!'));function move(d){lane=Math.min(2,Math.max(0,lane+d))}stage.onclick=e=>{const b=e.target.closest('[data-laser]');if(b)move(b.dataset.laser==='left'?-1:1)};keyHandler=e=>{if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a'){e.preventDefault();move(-1)}else if(e.key==='ArrowRight'||e.key.toLowerCase()==='d'){e.preventDefault();move(1)}};function draw(t){if(phase!=='playing')return;const dt=Math.min(52,t-last);last=t;elapsed+=dt;spawn+=dt;if(spawn>[600,495,410][l]){spawn=0;lasers.push({lane:rand(0,2),y:-40,vy:[2.6,3.2,3.9][l]})}ctx.clearRect(0,0,344,295);ctx.fillStyle='#120f27';ctx.fillRect(0,0,344,295);for(let i=0;i<3;i++){ctx.fillStyle=i===lane?'#373260':'#211937';ctx.fillRect(15+i*105,5,103,285);ctx.strokeStyle='#7153a750';ctx.strokeRect(15+i*105,5,103,285)}for(const f of lasers){f.y+=f.vy*dt/16.7;ctx.fillStyle='#ff4f90';ctx.fillRect(20+f.lane*105,f.y,94,23);ctx.fillStyle='#ffc1dd';ctx.fillRect(23+f.lane*105,f.y+4,88,5);if(f.y>220&&f.y<250&&f.lane===lane&&!f.hit){f.hit=true;lives--;toast('LASER HIT!');if(lives<=0){finish(false,'You got blasted by the laser storm.');return}}}const before=lasers.length;lasers=lasers.filter(x=>x.y<300);score(state.score+before-lasers.length);ctx.font='34px system-ui';ctx.textAlign='center';ctx.fillText('▲',66+lane*105,264);ctx.fillStyle='#fff';ctx.font='bold 16px system-ui';ctx.textAlign='left';ctx.fillText('♥ '.repeat(lives),12,26);frame(draw)}frame(draw)};
+// Pop Party: position-based quick tap challenges with hazards.
+MODES.pop=function(){const l=level(),goal=[17,22,28][l];let lives=[2,2,1][l],serial=0;state.scoreLabel='Popped';clock([23,23,23][l]);function spawn(){if(phase!=='playing')return;serial++;const s=serial,target=rand(0,15),bombs=shuffled(Array.from({length:16},(_,i)=>i).filter(i=>i!==target)).slice(0,[3,5,7][l]);stage.innerHTML=`<div class="hint">POP ${goal} BALLOONS · ♥ ${lives} · Don't tap the bombs!</div><div class="gridgame" style="grid-template-columns:repeat(4,1fr);max-width:275px;gap:6px">${Array.from({length:16},(_,i)=>`<button class="cell" data-pop="${i}" style="background:${i===target?'#af5695':bombs.includes(i)?'#6c2c49':'#30254f'};font-size:28px">${i===target?'●':bombs.includes(i)?'×':'·'}</button>`).join('')}</div>`;later(()=>{if(phase==='playing'&&serial===s)spawn()},[960,720,540][l])}stage.onclick=e=>{const b=e.target.closest('[data-pop]');if(!b)return;if(b.textContent==='●'){score(state.score+1);if(state.score>=goal){finish(true,'Party legend! You popped every balloon.');return}spawn()}else if(b.textContent==='×'){lives--;if(lives<=0){finish(false,'Too many bombs!');return}toast('Bomb! ♥ '+lives);spawn()}else{state.time=Math.max(1,state.time-1);hud()}};spawn()};
+// Risky Tiles: memorize dangerous tiles, pick enough safe choices.
+MODES.risk=function(){const l=level(),size=4,n=size*size,goal=[10,12,14][l],traps=[4,6,7][l];state.scoreLabel='Safe picks';clock([45,43,41][l]);let bad=[],chosen=new Set(),locked=true,lives=[2,2,1][l];function next(){bad=shuffled(Array.from({length:n},(_,i)=>i)).slice(0,traps);chosen=new Set();locked=true;draw(true);later(()=>{locked=false;draw(false)},[1550,1250,1000][l])}function draw(reveal){stage.innerHTML=`<div class="hint">${reveal?'MEMORIZE THE TRAPS! ×':'Pick safe tiles!'} · ♥ ${lives}</div><div class="gridgame" style="grid-template-columns:repeat(4,1fr);max-width:270px">${Array.from({length:n},(_,i)=>`<button class="cell" data-risk="${i}" style="font-size:25px;background:${chosen.has(i)?'#318d76':'#5a3a8a'}">${chosen.has(i)?'OK':reveal&&bad.includes(i)?'×':reveal?'◆':'?'}</button>`).join('')}</div>`}stage.onclick=e=>{const b=e.target.closest('[data-risk]');if(!b||locked)return;const i=Number(b.dataset.risk);if(chosen.has(i))return;if(bad.includes(i)){lives--;locked=true;toast('TRAP!');if(lives<=0){finish(false,'You stepped on too many traps.');return}later(next,350);return}chosen.add(i);score(state.score+1);if(state.score>=goal){finish(true,`You survived ${goal} risky picks!`);return}if(chosen.size>=3){locked=true;later(next,300)}else draw(false)};next()};
+// Chain Pop: visual spatial chain-reaction game.
+MODES.chain=function(){const l=level(),rounds=4,need=[5,5,5][l];state.scoreLabel='Bubbles';clock([44,40,37][l]);let bubbles=[],round=0;function makeRound(){round++;const centers=[{x:66,y:72},{x:278,y:77},{x:166,y:230}];bubbles=[];for(let c=0;c<3;c++){for(let j=0;j<5;j++){const x=Math.max(18,Math.min(326,centers[c].x+rand(-[25,31,36][l],[25,31,36][l]))),y=Math.max(22,Math.min(273,centers[c].y+rand(-[25,31,36][l],[25,31,36][l])));bubbles.push({x,y})}}draw()}function draw(){stage.innerHTML=`<div class="hint">ROUND ${round}/${rounds} · Start one chain with a single bubble!</div><div style="position:relative;width:100%;height:277px;max-width:334px">${bubbles.map((b,i)=>`<button data-chain="${i}" aria-label="Bubble ${i+1}" style="position:absolute;left:${b.x/344*100}%;top:${b.y/295*100}%;transform:translate(-50%,-50%);width:30px;height:30px;border-radius:50%;border:2px solid #b8fffb88;background:radial-gradient(circle at 30% 28%,#d9fff9,#8b6cec 45%,#6942c2);box-shadow:0 0 16px #8b6cec88"></button>`).join('')}</div>`}stage.onclick=e=>{const b=e.target.closest('[data-chain]');if(!b)return;const seen=new Set([Number(b.dataset.chain)]),q=[Number(b.dataset.chain)],radius=[46,42,39][l];while(q.length){const i=q.shift();for(let j=0;j<bubbles.length;j++){if(seen.has(j))continue;if(Math.hypot(bubbles[i].x-bubbles[j].x,bubbles[i].y-bubbles[j].y)<radius){seen.add(j);q.push(j)}}}score(state.score+seen.size);toast(`* ${seen.size} POP CHAIN!`);if(seen.size<need){finish(false,`Chain too small: ${seen.size}. Need ${need} to survive.`);return}if(round>=rounds){finish(true,`Created ${rounds} massive chain reactions!`);return}later(makeRound,620)};makeRound()};
+// Glitch Grab: fake decoys and the genuine prize that keeps teleporting.
+MODES.glitch=function(){const l=level(),goal=[14,18,23][l];state.scoreLabel='Real prizes';clock([25,23,22][l]);let serial=0,prize=0;function spawn(){if(phase!=='playing')return;serial++;let s=serial;prize=rand(0,15);const decoys=shuffled(Array.from({length:16},(_,i)=>i).filter(i=>i!==prize)).slice(0,[7,10,12][l]);stage.innerHTML=`<div class="hint">Catch the ◆ before it teleports. Fake ones steal time.</div><div class="gridgame" style="grid-template-columns:repeat(4,1fr);max-width:278px">${Array.from({length:16},(_,i)=>`<button class="cell" data-glitch="${i}" style="font-size:27px;background:${i===prize?'#945ec5':'#423359'}">${i===prize?'◆':decoys.includes(i)?'●':'·'}</button>`).join('')}</div>`;later(()=>{if(phase==='playing'&&serial===s)spawn()},[780,570,420][l])}stage.onclick=e=>{const b=e.target.closest('[data-glitch]');if(!b)return;if(Number(b.dataset.glitch)===prize){score(state.score+1);if(state.score>=goal){finish(true,'Glitch hunter! All prizes caught.');return}spawn()}else{state.time=Math.max(1,state.time-2);hud();toast('FAKE! −2 seconds')}};spawn()};
+
+
+// Orbit Shot: one click at the moment a moving marker enters a small zone.
+MODES.orbit=function(){const l=level(),need=[5,7,9][l];state.scoreLabel='Hits';let r=0,angle=-2,velocity=[.040,.055,.069][l],target=0,last=performance.now();clock([23,22,21][l]);stage.innerHTML='<canvas width="344" height="295" aria-label="Orbit timing game"></canvas><button class="btn main" id="fireOrbit" style="margin-top:5px">FIRE</button>';const cvs=stage.querySelector('canvas'),ctx=cvs.getContext('2d');function shot(){const diff=Math.abs(Math.atan2(Math.sin(angle-target),Math.cos(angle-target)));if(diff<[.30,.24,.20][l]){score(state.score+1);if(state.score>=need){finish(true,'Every shot landed.');return}target=random()*Math.PI*2;velocity*=1.065}else{finish(false,'Missed the zone. Take another shot.')}}stage.querySelector('#fireOrbit').onclick=shot;keyHandler=e=>{if(e.code==='Space'){e.preventDefault();shot()}};target=random()*Math.PI*2;function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last);last=t;angle+=velocity*dt/16.7;ctx.clearRect(0,0,344,295);ctx.fillStyle='#14162d';ctx.fillRect(0,0,344,295);const x=172,y=142,rad=95;ctx.lineWidth=15;ctx.strokeStyle='#373457';ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.stroke();ctx.lineWidth=17;ctx.strokeStyle='#d9ff60';ctx.beginPath();ctx.arc(x,y,rad,target-[.30,.24,.20][l],target+[.30,.24,.20][l]);ctx.stroke();ctx.fillStyle='#ff819d';ctx.beginPath();ctx.arc(x+rad*Math.cos(angle),y+rad*Math.sin(angle),13,0,Math.PI*2);ctx.fill();ctx.fillStyle='white';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(`${state.score}/${need} HITS`,172,148);frame(draw)}frame(draw)};
+// Switch Up: alternating sides with fast safe color calls.
+MODES.switch=function(){const l=level(),goal=[10,13,16][l];state.scoreLabel='Survived';let round=0,needed=0,serial=0;clock([24,22,21][l]);stage.innerHTML='<div id="switchText" style="font-size:14px;font-weight:900;text-align:center;letter-spacing:.05em">PICK THE SAFE SIDE</div><div style="display:flex;gap:10px;width:100%;max-width:290px;margin-top:15px"><button data-side="0" style="flex:1;border:3px solid #ffffff55;border-radius:19px;height:165px;background:#ff6483;color:white;font-size:19px;font-weight:1000">PINK</button><button data-side="1" style="flex:1;border:3px solid #ffffff55;border-radius:19px;height:165px;background:#78dbba;color:#15172e;font-size:19px;font-weight:1000">MINT</button></div>';const label=stage.querySelector('#switchText');function next(){if(phase!=='playing')return;serial++;round++;needed=rand(0,1);const s=serial;label.textContent='SAFE SIDE: '+(needed?'MINT':'PINK');later(()=>{if(serial===s&&phase==='playing')finish(false,'Too slow. The safe side changed.')},[1700,1320,1080][l])}stage.onclick=e=>{const b=e.target.closest('[data-side]');if(!b)return;if(+b.dataset.side!==needed){finish(false,'Wrong side. The next round is waiting.');return}score(state.score+1);if(state.score>=goal){finish(true,'You survived every switch.');return}next()};keyHandler=e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();stage.querySelector(`[data-side="${e.key==='ArrowLeft'?0:1}"]`)?.click()}};next()};
+
+// Dedicated simultaneous and turn-based local versus games. No network is implied.
+const VS_GAMES = [
+{id:'vs_hockey',name:'Air Hockey',category:'LIVE DUEL',sub:'Two paddles. One puck. First to five.',desc:'P1: WASD or drag on the lower half. P2: arrow keys or drag on the upper half.',theme:'coral',symbol:'◉'},
+{id:'vs_pong',name:'Pong Clash',category:'LIVE DUEL',sub:'Old-school reflexes. New rivalries.',desc:'P1: W / S or drag on the left. P2: ↑ / ↓ or drag on the right.',theme:'blue',symbol:'▮'},
+{id:'vs_trails',name:'Light Trails',category:'SURVIVAL',sub:'One wrong turn. Game over.',desc:'P1 uses WASD, P2 uses arrow keys. Steer without hitting the walls or trails.',theme:'violet',symbol:'▧'},
+{id:'vs_sumo',name:'Sumo Clash',category:'LIVE DUEL',sub:'Push your rival out of the ring.',desc:'P1 uses WASD + F to dash. P2 uses arrows + L to dash. Touch: drag your player.',theme:'orange',symbol:'◎'},
+{id:'vs_coins',name:'Coin Scramble',category:'SCORE BATTLE',sub:'Snatch the coins before they do.',desc:'P1 uses WASD, P2 uses arrows. Touch: drag your player to the coins.',theme:'mint',symbol:'◆'},
+{id:'vs_paint',name:'Paint War',category:'TERRITORY',sub:'Color the arena. Claim the win.',desc:'P1 uses WASD, P2 uses arrows. Touch: drag to steer. Most tiles wins.',theme:'pink',symbol:'▦'},
+{id:'vs_laser',name:'Laser Tag',category:'LIVE DUEL',sub:'Move. Dodge. Tag.',desc:'P1 uses WASD, P2 uses arrows. Blasters fire automatically. Touch: drag to move.',theme:'blue',symbol:'✦'},
+{id:'vs_draw',name:'Quickdraw',category:'REFLEX DUEL',sub:'Wait for the signal. Strike first.',desc:'P1 presses F or taps LEFT. P2 presses J or taps RIGHT. False starts lose points.',theme:'peach',symbol:'⚡'},
+{id:'vs_connect',name:'Four in a Row',category:'STRATEGY',sub:'Four connected pieces wins.',desc:'Take turns dropping discs. Tap a column. P1 goes first.',theme:'lime',symbol:'●'},
+{id:'vs_catch',name:'Catch Clash',category:'SCORE BATTLE',sub:'Catch the good. Dodge the bad.',desc:'P1 moves with A / D. P2 moves with ← / →. Touch: drag your catcher.',theme:'coral',symbol:'▱'},
+{id:'vs_volley',name:'Neon Volley',category:'LIVE DUEL',sub:'One ball. Two rivals. Keep it off your floor.',desc:'P1: A / D + F to volley. P2: ← / → + J. Touch: drag your paddle.',theme:'mint',symbol:'●'},
+{id:'vs_tug',name:'Power Pull',category:'REACTION',sub:'Tap faster. Win the tug of war.',desc:'Player 1 presses F; Player 2 presses J. Or tap your own button.',theme:'orange',symbol:'◀'},
+{id:'vs_flag',name:'Flag Grab',category:'CHASE',sub:'Steal the crystal and take it home.',desc:'P1: WASD. P2: arrows. Touch: drag your player. Tag to steal.',theme:'blue',symbol:'◆'},
+{id:'vs_meteor',name:'Meteor Duel',category:'SURVIVAL',sub:'Side-by-side survival. Last player standing.',desc:'P1: A / D. P2: ← / →. Touch: drag your ship.',theme:'violet',symbol:'▲'},
+{id:'vs_pop',name:'Pop Duel',category:'SPEED BATTLE',sub:'Pop your balloons faster than your rival.',desc:'Each player taps circles on their own half. Yellow circles lose points.',theme:'coral',symbol:'◌'},
+{id:'vs_bricks',name:'Brick Brawl',category:'ARCADE DUEL',sub:'Clear the wall before they do.',desc:'P1: A / D. P2: ← / →. Touch: drag your paddle.',theme:'pink',symbol:'▥'},
+{id:'vs_boxes',name:'Dots & Boxes',category:'STRATEGY',sub:'Close the most boxes. Steal the board.',desc:'Take turns tapping a line between dots. Finish a box to play again.',theme:'lime',symbol:'□'},
+{id:'vs_mind',name:'Mind Games',category:'PARTY DUEL',sub:'Secret choices. Public consequences.',desc:'Pass the screen between choices. Rock beats scissors, scissors beat paper, paper beats rock.',theme:'peach',symbol:'◈'},
+{id:'vs_cannon',name:'Cannon Clash',category:'LIVE DUEL',sub:'Aim, fire, and hit the other turret.',desc:'P1: W / S to aim, F to fire. P2: ↑ / ↓ to aim, J to fire. Touch: tap to aim/shoot.',theme:'blue',symbol:'◉'},
+{id:'vs_tag',name:'Freeze Tag',category:'CHASE',sub:'Outrun the chaser or catch your rival.',desc:'P1: WASD. P2: arrows. Touch: drag your character.',theme:'mint',symbol:'◎'}
+];
+let vsHeld=new Set(), vsPointers=new Map();
+const vsColorA='#ff6d9e',vsColorB='#a7ff65',vsBg='#151931';
+function vsCanvas(h=320){stage.innerHTML=`<div class="vs-arena"><canvas width="344" height="${h}" aria-label="Two player game arena"></canvas><div class="vs-badge-row"><span>P1 · PINK</span><span>${computerMode?'CPU':'P2'} · LIME</span></div></div>`;const c=stage.querySelector('canvas');c.style.touchAction='none';/* Touch gestures still bubble to the swipe feed, even during a live match. */return [c,c.getContext('2d')];}
+function vsUpdate(a,b,t){state.score=a;state.vsB=b;$('scoreHUD').textContent=`${computerMode?'YOU':'P1'}  ${a}   |   ${computerMode?'CPU':'P2'}  ${b}`;$('clockHUD').textContent=t===undefined?'LIVE':`${Math.max(0,Math.ceil(t))}s`;}
+function vsWin(who,text){if(phase!=='playing')return;clearInterval(state.timer);tasks.forEach(clearTimeout);tasks=[];rafs.forEach(cancelAnimationFrame);rafs.clear();session++;vsHeld.clear();vsPointers.clear();phase='won';if(who===1||who===2){progress.wins++;progress.conquered[GAMES[idx].id]=true;persist()}const label=who===0?'IT’S A DRAW':computerMode?(who===1?'YOU WIN':'COMPUTER WINS'):`PLAYER ${who} WINS`;stage.insertAdjacentHTML('beforeend',`<div class="result vs-result" role="dialog" aria-label="Match result"><div class="roundmeta">HEAD-TO-HEAD</div><div class="big" style="background:${who===2?vsColorB:vsColorA};color:#1b1730">${who===0?'=':who}</div><h3>${label}</h3><p>${text||'Good game.'}</p><div class="buttons"><button class="btn white" id="vsAgain">REMATCH</button><button class="btn main" id="vsNext">NEXT DUEL</button></div></div>`);$('vsAgain').onclick=()=>{currentSeed=newSeed();startGame()};$('vsNext').onclick=nextGame;}
+function vsTimer(seconds,ended){let left=seconds;vsUpdate(state.score||0,state.vsB||0,left);state.timer=setInterval(()=>{if(phase!=='playing')return;left--;state.vsTime=left;vsUpdate(state.score||0,state.vsB||0,left);if(left<=0){clearInterval(state.timer);ended()}},1000);state.vsTime=left;}
+const vxClamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function vsCircle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function vsRound(ctx){ctx.fillStyle=vsBg;ctx.fillRect(0,0,344,320);ctx.strokeStyle='#ffffff13';ctx.lineWidth=1;for(let x=12;x<344;x+=27){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,320);ctx.stroke()}}
+function vsText(ctx,text,x,y,size=14,color='#fff'){ctx.textAlign='center';ctx.font=`900 ${size}px system-ui`;ctx.fillStyle=color;ctx.fillText(text,x,y)}
+function vsListenCanvas(c,choose,update){c.addEventListener('pointerdown',e=>{if(phase!=='playing')return;const r=c.getBoundingClientRect(),p={x:(e.clientX-r.left)*344/r.width,y:(e.clientY-r.top)*320/r.height};const side=choose(p,e);if(side&&!(computerMode&&side===2)){vsPointers.set(e.pointerId,side);c.setPointerCapture?.(e.pointerId);update(side,p)}});c.addEventListener('pointermove',e=>{const side=vsPointers.get(e.pointerId);if(!side||phase!=='playing')return;const r=c.getBoundingClientRect();update(side,{x:(e.clientX-r.left)*344/r.width,y:(e.clientY-r.top)*320/r.height})});for(const event of ['pointerup','pointercancel','lostpointercapture'])c.addEventListener(event,e=>vsPointers.delete(e.pointerId));}
+function vsMove(p1,p2,dt,speed=3.4,bounds){const step=speed*dt/16.67;for(const [p,up,down,left,right] of [[p1,'w','s','a','d'],[p2,'ArrowUp','ArrowDown','ArrowLeft','ArrowRight']]){let dx=+vsHeld.has(right)-+vsHeld.has(left),dy=+vsHeld.has(down)-+vsHeld.has(up);const len=Math.hypot(dx,dy)||1;p.x+=step*dx/len;p.y+=step*dy/len;const b=bounds(p);p.x=vxClamp(p.x,b[0],b[1]);p.y=vxClamp(p.y,b[2],b[3]);}}
+// Computer rivals: local gameplay AI, no network, external AI API, or accounts required.
+const cpuKeys=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','l'];
+function cpuSet(dx=0,dy=0,action=false,actionKey='j'){
+ for(const k of cpuKeys)vsHeld.delete(k);
+ if(dx>11)vsHeld.add('ArrowRight');else if(dx<-11)vsHeld.add('ArrowLeft');
+ if(dy>11)vsHeld.add('ArrowDown');else if(dy<-11)vsHeld.add('ArrowUp');
+ if(action)vsHeld.add(actionKey);
+}
+function cpuApproach(me,target,action=false,actionKey='j'){
+ if(!computerMode)return;
+ cpuSet(target.x-me.x,target.y-me.y,action,actionKey);
+}
+function cpuTarget(me,items){return [...items].sort((a,b)=>Math.hypot(a.x-me.x,a.y-me.y)-Math.hypot(b.x-me.x,b.y-me.y))[0]}
+function cpuInterval(fn,ms){if(!computerMode)return;const loop=()=>{if(phase!=='playing'||!computerMode)return;fn();later(loop,ms)};later(loop,ms)}
+const VS_MODES={};
+// 1. AIR HOCKEY: two independent paddles and a physical puck.
+VS_MODES.vs_hockey=()=>{const [c,ctx]=vsCanvas(),l=level(),p1={x:172,y:261,r:22},p2={x:172,y:59,r:22};let puck={x:172,y:160,vx:2.6,vy:2.8,r:10},a=0,b=0,last=performance.now();vsUpdate(a,b);vsTimer([76,66,58][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b}`));vsListenCanvas(c,p=>p.y>160?1:2,(side,p)=>{const v=side===1?p1:p2;v.x=vxClamp(p.x,23,321);v.y=vxClamp(p.y,side===1?187:23,side===1?296:133)}); botTick=()=>{const aimX=puck.y<185?puck.x+puck.vx*4:172;cpuApproach(p2,{x:vxClamp(aimX,38,306),y:puck.y<150?vxClamp(puck.y+25,38,116):65});};
+ function resetPuck(dir){puck={x:172,y:160,vx:(random()-.5)*4,vy:dir*(3.5+level()*.6),r:10}}function paint(t){if(phase!=='playing')return;const dt=Math.min(40,t-last);last=t;vsMove(p1,p2,dt,3.6+level()*.4,p=>[23,321,p===p1?187:23,p===p1?296:133]);puck.x+=puck.vx*dt/16.7;puck.y+=puck.vy*dt/16.7;puck.vx*=.999;puck.vy*=.999;if(puck.x<12||puck.x>332){puck.x=vxClamp(puck.x,12,332);puck.vx*=-1}for(const p of [p1,p2]){const dx=puck.x-p.x,dy=puck.y-p.y,dist=Math.hypot(dx,dy);if(dist<p.r+puck.r&&dist>0){const nx=dx/dist,ny=dy/dist;puck.x=p.x+nx*(p.r+puck.r+1);puck.y=p.y+ny*(p.r+puck.r+1);const speed=Math.min(10,Math.max(4.3,Math.hypot(puck.vx,puck.vy)*1.09));puck.vx=nx*speed;puck.vy=ny*speed}}const goal=puck.x>108&&puck.x<236;if(puck.y<9){if(goal){a++;vsUpdate(a,b,state.vsTime);if(a>=5){vsWin(1,`${a} – ${b}. First to five!`);return}resetPuck(1)}else{puck.y=11;puck.vy=Math.abs(puck.vy)}}if(puck.y>311){if(goal){b++;vsUpdate(a,b,state.vsTime);if(b>=5){vsWin(2,`${a} – ${b}. First to five!`);return}resetPuck(-1)}else{puck.y=309;puck.vy=-Math.abs(puck.vy)}}vsRound(ctx);ctx.strokeStyle='#ffffff40';ctx.lineWidth=3;ctx.strokeRect(6,6,332,308);ctx.beginPath();ctx.moveTo(0,160);ctx.lineTo(344,160);ctx.stroke();ctx.beginPath();ctx.arc(172,160,51,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#111628';ctx.fillRect(108,0,128,10);ctx.fillRect(108,310,128,10);vsCircle(ctx,p2.x,p2.y,22,vsColorB);vsCircle(ctx,p1.x,p1.y,22,vsColorA);vsCircle(ctx,puck.x,puck.y,10,'#fff');vsText(ctx,`${b}`,24,34,16,vsColorB);vsText(ctx,`${a}`,320,298,16,vsColorA);frame(paint)}frame(paint)};
+// 2. PONG CLASH: paddle tracking via keyboard or touch.
+VS_MODES.vs_pong=()=>{const [c,ctx]=vsCanvas(),l=level();let y1=155,y2=155,ball={x:172,y:160,vx:3.8,vy:2},a=0,b=0,last=performance.now();vsUpdate(a,b);vsTimer([80,70,60][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b}`));vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{if(side===1)y1=vxClamp(p.y,30,290);else y2=vxClamp(p.y,30,290)}); botTick=()=>cpuSet(0,ball.y-y2);
+ function resetBall(dir){ball={x:172,y:160,vx:dir*(4+level()*.45),vy:(random()-.5)*5}}function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last)/16.7;last=t;y1=vxClamp(y1+((+vsHeld.has('s'))-(+vsHeld.has('w')))*6*dt,34,286);y2=vxClamp(y2+((+vsHeld.has('ArrowDown'))-(+vsHeld.has('ArrowUp')))*6*dt,34,286);ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;if(ball.y<10||ball.y>310){ball.vy*=-1;ball.y=vxClamp(ball.y,11,309)}if(ball.x<26&&ball.x>13&&Math.abs(ball.y-y1)<38&&ball.vx<0){ball.vx=Math.abs(ball.vx)*1.07;ball.vy+=(ball.y-y1)*.032}if(ball.x>318&&ball.x<332&&Math.abs(ball.y-y2)<38&&ball.vx>0){ball.vx=-Math.abs(ball.vx)*1.07;ball.vy+=(ball.y-y2)*.032}if(ball.x<0||ball.x>344){const right=ball.x<0;if(right)b++;else a++;vsUpdate(a,b,state.vsTime);if(a>=7||b>=7){vsWin(a>b?1:2,`${a} – ${b}. First to seven!`);return}resetBall(right?1:-1)}vsRound(ctx);ctx.setLineDash([8,10]);ctx.strokeStyle='#ffffff70';ctx.beginPath();ctx.moveTo(172,0);ctx.lineTo(172,320);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=vsColorA;ctx.fillRect(12,y1-33,12,66);ctx.fillStyle=vsColorB;ctx.fillRect(320,y2-33,12,66);vsCircle(ctx,ball.x,ball.y,9,'#fff');vsText(ctx,`${a}`,113,39,30,vsColorA);vsText(ctx,`${b}`,231,39,30,vsColorB);frame(draw)}frame(draw)};
+// 3. LIGHT TRAILS: true simultaneous grid survival.
+VS_MODES.vs_trails=()=>{const [c,ctx]=vsCanvas(),l=level(),cols=20,rows=18,cw=16.6,ch=16.1;let p=[{x:4,y:9,d:1,nd:1,alive:true},{x:15,y:9,d:3,nd:3,alive:true}],trail=new Set(),last=performance.now(),acc=0;vsUpdate(0,0);const dirs=[[0,-1],[1,0],[0,1],[-1,0]];const inputMap={w:[0,0],d:[0,1],s:[0,2],a:[0,3],ArrowUp:[1,0],ArrowRight:[1,1],ArrowDown:[1,2],ArrowLeft:[1,3]};keyHandler=e=>{const c=inputMap[e.key];if(!c)return;e.preventDefault();const q=p[c[0]];if((c[1]+2)%4!==q.d)q.nd=c[1]};
+  botTick=()=>{const q=p[1],options=[q.d,(q.d+1)%4,(q.d+3)%4];let best=q.d,high=-Infinity;for(const d of options){let sc=0;for(let step=1;step<=7;step++){const x=q.x+dirs[d][0]*step,y=q.y+dirs[d][1]*step;if(x<0||x>=cols||y<0||y>=rows||trail.has(x+','+y))break;sc+=1;}sc+=random()*.2;if(sc>high){high=sc;best=d}}q.nd=best};
+ stage.querySelector('.vs-arena').insertAdjacentHTML('beforeend',`<div class="vs-trail-pads"><div><b>P1</b><button data-vkey="a">←</button><button data-vkey="w">↑</button><button data-vkey="s">↓</button><button data-vkey="d">→</button></div><div><b>P2</b><button data-vkey="ArrowLeft">←</button><button data-vkey="ArrowUp">↑</button><button data-vkey="ArrowDown">↓</button><button data-vkey="ArrowRight">→</button></div></div>`);
+ stage.querySelectorAll('[data-vkey]').forEach(btn=>btn.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();keyHandler({key:btn.dataset.vkey,preventDefault:()=>{}})}));vsTimer([55,45,38][l],()=>vsWin(0,'Nobody crashed. Rematch!'));function draw(t){if(phase!=='playing')return;acc+=Math.min(48,t-last);last=t;const interval=[128,104,82][l];if(acc>=interval){acc=0;const next=p.map(q=>{q.d=q.nd;return{x:q.x+dirs[q.d][0],y:q.y+dirs[q.d][1]}});let crashes=next.map((q,i)=>q.x<0||q.x>=cols||q.y<0||q.y>=rows||trail.has(q.x+','+q.y)||next.every((z,j)=>j===i||!(z.x===q.x&&z.y===q.y))===false);for(let i=0;i<2;i++){trail.add(p[i].x+','+p[i].y);p[i].x=next[i].x;p[i].y=next[i].y;p[i].alive=!crashes[i]}if(crashes.some(Boolean)){const winner=crashes[0]&&crashes[1]?0:crashes[0]?2:1;vsWin(winner,winner?'The other rider hit a wall.':'Double crash!');return}}vsRound(ctx);ctx.fillStyle='#0e1328';ctx.fillRect(6,12,332,296);ctx.strokeStyle='#3d475f';ctx.strokeRect(6,12,332,296);for(const tile of trail){const [x,y]=tile.split(',').map(Number);ctx.fillStyle=(x<10?'#fb739a':'#bdff7a')+'aa';ctx.fillRect(6+x*cw,12+y*ch,cw-1,ch-1)}p.forEach((q,i)=>{ctx.fillStyle=i?vsColorB:vsColorA;ctx.fillRect(6+q.x*cw,12+q.y*ch,cw-2,ch-2)});frame(draw)}frame(draw)};
+// 4. SUMO CLASH: physics-inspired ring push and dashes.
+VS_MODES.vs_sumo=()=>{const [c,ctx]=vsCanvas(),l=level(),p1={x:122,y:160,r:19},p2={x:222,y:160,r:19};let last=performance.now(),cd=[0,0],wins=[0,0];vsUpdate(0,0);vsTimer([70,62,55][l],()=>vsWin(wins[0]===wins[1]?0:wins[0]>wins[1]?1:2,`${wins[0]} – ${wins[1]}`));vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;const dx=p.x-q.x,dy=p.y-q.y,dist=Math.hypot(dx,dy)||1;q.x+=dx/dist*Math.min(18,dist);q.y+=dy/dist*Math.min(18,dist)}); botTick=t=>cpuApproach(p2,p1,Math.hypot(p2.x-p1.x,p2.y-p1.y)<110&&t>cd[1],'l');
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last),step=dt/16.7;last=t;vsMove(p1,p2,dt,[3.2,3.8,4.4][l],()=>[12,332,12,308]);for(const [i,k,q,v] of [[0,'f',p1,p2],[1,'l',p2,p1]]){if(vsHeld.has(k)&&t>cd[i]){const dx=v.x-q.x,dy=v.y-q.y,len=Math.hypot(dx,dy)||1;q.x+=dx/len*26;q.y+=dy/len*26;cd[i]=t+750}}const dx=p2.x-p1.x,dy=p2.y-p1.y,d=Math.hypot(dx,dy)||1;if(d<40){const push=(40-d)/2+1,nx=dx/d,ny=dy/d;p1.x-=nx*push;p1.y-=ny*push;p2.x+=nx*push;p2.y+=ny*push}const out=[p1,p2].map(q=>Math.hypot(q.x-172,q.y-160)>130);if(out[0]||out[1]){const winner=out[0]&&!out[1]?2:out[1]&&!out[0]?1:0;if(winner)wins[winner-1]++;vsUpdate(wins[0],wins[1],state.vsTime);if(wins.some(x=>x>=3)){vsWin(wins[0]>wins[1]?1:2,`${wins[0]} – ${wins[1]}. First to three!`);return}p1.x=122;p1.y=160;p2.x=222;p2.y=160}vsRound(ctx);ctx.lineWidth=7;ctx.strokeStyle='#ffffffb0';ctx.beginPath();ctx.arc(172,160,129,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(172,160,85,0,Math.PI*2);ctx.strokeStyle='#ffffff25';ctx.lineWidth=2;ctx.stroke();vsCircle(ctx,p1.x,p1.y,19,vsColorA);vsCircle(ctx,p2.x,p2.y,19,vsColorB);vsText(ctx,'1',p1.x,p1.y+5,17,'#202039');vsText(ctx,'2',p2.x,p2.y+5,17,'#202039');frame(draw)}frame(draw)};
+// 5. COIN SCRAMBLE: shared arena, simultaneous collection.
+VS_MODES.vs_coins=()=>{const [c,ctx]=vsCanvas(),l=level(),p1={x:60,y:158},p2={x:284,y:158};let coins=Array.from({length:6},()=>({x:rand(28,316),y:rand(35,282)})),a=0,b=0,last=performance.now();vsUpdate(0,0);vsTimer([55,48,42][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b} coins`));vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;q.x=vxClamp(p.x,16,328);q.y=vxClamp(p.y,16,304)}); botTick=()=>{const nearest=cpuTarget(p2,coins);if(nearest)cpuApproach(p2,nearest)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last);last=t;vsMove(p1,p2,dt,3.2+level()*.6,()=>[14,330,14,306]);for(const coin of coins)for(const [i,p] of [[1,p1],[2,p2]])if(Math.hypot(p.x-coin.x,p.y-coin.y)<23){i===1?a++:b++;coin.x=rand(28,316);coin.y=rand(35,282);vsUpdate(a,b,state.vsTime);if(a>=15||b>=15){vsWin(a>b?1:2,`${a} – ${b} coins!`);return}}vsRound(ctx);for(const coin of coins){vsCircle(ctx,coin.x,coin.y,9,'#ffdb75');vsCircle(ctx,coin.x,coin.y,4,'#fff5b4')}vsCircle(ctx,p1.x,p1.y,16,vsColorA);vsCircle(ctx,p2.x,p2.y,16,vsColorB);vsText(ctx,'1',p1.x,p1.y+4,13,'#1b2034');vsText(ctx,'2',p2.x,p2.y+4,13,'#1b2034');frame(draw)}frame(draw)};
+// 6. PAINT WAR: tile turf takeover in real time.
+VS_MODES.vs_paint=()=>{const [c,ctx]=vsCanvas(),cols=12,rows=10,cw=27.5,ch=27,p1={x:2,y:4},p2={x:9,y:5},grid=Array(cols*rows).fill(0);let last=performance.now(),tick=0;vsUpdate(0,0);vsTimer([40,34,28][level()],()=>{const a=grid.filter(x=>x===1).length,b=grid.filter(x=>x===2).length;vsWin(a===b?0:a>b?1:2,`${a} – ${b} squares claimed`)}); botTick=()=>{const open=[];for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)if(grid[y*cols+x]!==2)open.push({x,y});const dest=cpuTarget(p2,open);if(dest)cpuSet((dest.x-p2.x)*30,(dest.y-p2.y)*30)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(45,t-last);last=t;tick+=dt;if(tick>[92,80,70][level()]){tick=0;for(const [p,up,down,left,right,i] of [[p1,'w','s','a','d',1],[p2,'ArrowUp','ArrowDown','ArrowLeft','ArrowRight',2]]){p.x=vxClamp(p.x+(+vsHeld.has(right)-+vsHeld.has(left)),0,cols-1);p.y=vxClamp(p.y+(+vsHeld.has(down)-+vsHeld.has(up)),0,rows-1);grid[p.y*cols+p.x]=i}vsUpdate(grid.filter(x=>x===1).length,grid.filter(x=>x===2).length,state.vsTime)}vsRound(ctx);for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const n=grid[y*cols+x];ctx.fillStyle=n===1?'#fd5d8d':n===2?'#b6fa59':'#2c3252';ctx.fillRect(7+x*cw,24+y*ch,cw-2,ch-2)}for(const [p,i] of [[p1,1],[p2,2]]){vsCircle(ctx,7+p.x*cw+cw/2,24+p.y*ch+ch/2,12,'white');vsText(ctx,String(i),7+p.x*cw+cw/2,29+p.y*ch+ch/2,14,'#182035')}frame(draw)}vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;q.x=vxClamp(Math.floor((p.x-7)/cw),0,cols-1);q.y=vxClamp(Math.floor((p.y-24)/ch),0,rows-1);grid[q.y*cols+q.x]=side});frame(draw)};
+// 7. LASER TAG: automatic targeting, simultaneous movement/dodging.
+VS_MODES.vs_laser=()=>{const [c,ctx]=vsCanvas(),p1={x:70,y:170,hp:5,fire:0},p2={x:274,y:150,hp:5,fire:0};let shots=[],last=performance.now();vsUpdate(0,0);vsTimer([65,57,48][level()],()=>vsWin(p1.hp===p2.hp?0:p1.hp>p2.hp?1:2,`Health left: ${p1.hp} – ${p2.hp}`));vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;q.x=vxClamp(p.x,15,329);q.y=vxClamp(p.y,15,305)}); botTick=()=>{let tx=p1.x,ty=p1.y;const incoming=shots.filter(s=>s.owner===0&&Math.hypot(s.x-p2.x,s.y-p2.y)<90);if(incoming.length){const shot=incoming[0];tx=vxClamp(p2.x-(shot.y-p2.y)*2,20,324);ty=vxClamp(p2.y+(shot.x-p2.x)*2,20,300)}cpuApproach(p2,{x:tx,y:ty});};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last),ratio=dt/16.7;last=t;vsMove(p1,p2,dt,3.1+level()*.25,()=>[15,329,15,305]);[p1,p2].forEach((p,i)=>{if(t<p.fire)return;const q=i?p1:p2,angle=Math.atan2(q.y-p.y,q.x-p.x)+(random()-.5)*(.27+level()*.06);shots.push({x:p.x,y:p.y,vx:Math.cos(angle)*6.3,vy:Math.sin(angle)*6.3,owner:i});p.fire=t+[1050,850,690][level()]});for(const bullet of shots){bullet.x+=bullet.vx*ratio;bullet.y+=bullet.vy*ratio;const target=bullet.owner===0?p2:p1;if(Math.hypot(bullet.x-target.x,bullet.y-target.y)<16){bullet.x=-999;target.hp--;vsUpdate(5-p1.hp,5-p2.hp,state.vsTime);if(target.hp<=0){vsWin(bullet.owner+1,'First to land five tags!');return}}}shots=shots.filter(q=>q.x>-10&&q.x<354&&q.y>-10&&q.y<330);vsRound(ctx);for(const bullet of shots)vsCircle(ctx,bullet.x,bullet.y,5,bullet.owner===0?vsColorA:vsColorB);vsCircle(ctx,p1.x,p1.y,16,vsColorA);vsCircle(ctx,p2.x,p2.y,16,vsColorB);vsText(ctx,'1',p1.x,p1.y+5,13,'#18162c');vsText(ctx,'2',p2.x,p2.y+5,13,'#18162c');frame(draw)}frame(draw)};
+// 8. QUICKDRAW: real head-to-head reaction, false-start penalties.
+VS_MODES.vs_draw=()=>{stage.innerHTML=`<div class="vs-reflex"><div class="vs-reflex-score"><b id="vsPA">0</b><b id="vsPB">0</b></div><h2 id="vsSignal">WAIT FOR IT</h2><div id="vsLight" class="vs-light"></div><div class="vs-reflex-buttons"><button id="vsFire1">PLAYER 1 · F</button><button id="vsFire2">PLAYER 2 · J</button></div><p>First to five. Don't fire early.</p></div>`;let a=0,b=0,armed=false,accept=false,signal=0,serial=0;vsUpdate(a,b);const signalEl=$('vsSignal'),light=$('vsLight');function round(){if(phase!=='playing')return;serial++;armed=false;accept=false;signalEl.textContent='WAIT FOR IT';light.style.background='#f56875';const n=serial;later(()=>{if(n!==serial||phase!=='playing')return;armed=true;signal=performance.now();signalEl.textContent='DRAW!';light.style.background='#afff63';if(computerMode)later(()=>{if(armed&&!accept)fire(2)},[420,310,235][level()]+Math.floor(random()*130));later(()=>{if(n===serial&&armed){armed=false;signalEl.textContent='TOO SLOW';later(round,650)}},1900)},1000+Math.floor(random()*2000))}function fire(p){if(phase!=='playing'||accept)return;accept=true;if(!armed){if(p===1)b++;else a++;signalEl.textContent=`FALSE START · P${p}`;light.style.background='#ef5586'}else{if(p===1)a++;else b++;signalEl.textContent=`P${p} · ${Math.round(performance.now()-signal)}ms`;light.style.background='#fff'}vsUpdate(a,b);$('vsPA').textContent=a;$('vsPB').textContent=b;if(a>=5||b>=5){vsWin(a>=5?1:2,`${a} – ${b}. Fastest fingers win!`);return}armed=false;later(round,750)} // CPU waits for the signal, then reacts with a human-like delay.
+ 
+ $('vsFire1').onclick=()=>fire(1);$('vsFire2').onclick=()=>{if(!computerMode)fire(2)};if(computerMode)$('vsFire2').disabled=true;keyHandler=e=>{if(!e.repeat&&e.key.toLowerCase()==='f')fire(1);if(!e.repeat&&e.key.toLowerCase()==='j')fire(2)};round()};
+// 9. FOUR IN A ROW: shared local turn-based duel with win recognition.
+VS_MODES.vs_connect=()=>{stage.innerHTML='<div class="vs-connect"><div id="vsTurn" class="vs-turn">PLAYER 1 · YOUR MOVE</div><div id="vsGrid" class="vs-grid"></div><div class="hint">TAP A COLUMN TO DROP YOUR DISC</div></div>';const board=Array.from({length:6},()=>Array(7).fill(0));let turn=1,moves=0;vsUpdate(0,0);const grid=$('vsGrid');function render(){grid.innerHTML=board.map(row=>row.map((v,x)=>`<button class="vs-slot ${v?'owned'+v:''}" data-col="${x}" aria-label="Column ${x+1}"><span></span></button>`).join('')).join('');$('vsTurn').textContent=`PLAYER ${turn} · YOUR MOVE`}$('vsGrid').onclick=e=>{const el=e.target.closest('[data-col]');if(!el||phase!=='playing')return;if(computerMode&&turn===2)return;const x=+el.dataset.col;let y=5;while(y>=0&&board[y][x])y--;if(y<0)return;board[y][x]=turn;moves++;const dirs=[[1,0],[0,1],[1,1],[1,-1]];let win=false;for(const [dx,dy] of dirs){let n=1;for(const sign of [-1,1]){let xx=x+dx*sign,yy=y+dy*sign;while(xx>=0&&xx<7&&yy>=0&&yy<6&&board[yy][xx]===turn){n++;xx+=dx*sign;yy+=dy*sign}}if(n>=4){win=true;break}}render();if(win){vsWin(turn,`Four connected discs. ${moves} moves played.`);return}if(moves===42){vsWin(0,'The board is full.');return}turn=3-turn;render();if(computerMode&&turn===2)later(cpuDrop,[480,330,240][level()])};function cpuDrop(){if(phase!=='playing'||turn!==2)return;const options=[];for(let x=0;x<7;x++)if(!board[0][x]){let y=5;while(y>=0&&board[y][x])y--;options.push({x,y})}if(!options.length)return;function has4(mark,x,y){const dirs=[[1,0],[0,1],[1,1],[1,-1]];return dirs.some(([dx,dy])=>{let n=1;for(const sign of [-1,1]){let xx=x+dx*sign,yy=y+dy*sign;while(xx>=0&&xx<7&&yy>=0&&yy<6&&board[yy][xx]===mark){n++;xx+=dx*sign;yy+=dy*sign}}return n>=4})}let choice=options.find(o=>{board[o.y][o.x]=2;const yes=has4(2,o.x,o.y);board[o.y][o.x]=0;return yes})||options.find(o=>{board[o.y][o.x]=1;const yes=has4(1,o.x,o.y);board[o.y][o.x]=0;return yes})||options.sort((a,b)=>Math.abs(a.x-3)-Math.abs(b.x-3))[0];const {x,y}=choice;board[y][x]=2;moves++;if(has4(2,x,y)){render();vsWin(2,'Computer connected four.');return}if(moves===42){vsWin(0,'The board is full.');return}turn=1;render()}render()};
+// 10. CATCH CLASH: two rival catchers with falling prizes and hazards.
+VS_MODES.vs_catch=()=>{const [c,ctx]=vsCanvas(),l=level();let x1=85,x2=260,a=0,b=0,items=[],last=performance.now(),spawn=0;vsUpdate(a,b);vsTimer([50,44,38][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b}`));vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{if(side===1)x1=vxClamp(p.x,18,326);else x2=vxClamp(p.x,18,326)}); botTick=()=>{const falling=items.filter(v=>!v.bad&&v.y<300).sort((a,b)=>b.y-a.y);if(falling.length)cpuSet(falling[0].x-x2,0)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(42,t-last),ratio=dt/16.7;last=t;x1=vxClamp(x1+((+vsHeld.has('d'))-(+vsHeld.has('a')))*6.2*ratio,18,326);x2=vxClamp(x2+((+vsHeld.has('ArrowRight'))-(+vsHeld.has('ArrowLeft')))*6.2*ratio,18,326);spawn+=dt;if(spawn>[480,390,310][l]){spawn=0;items.push({x:rand(25,320),y:-12,bad:random()<.22,vy:3.3+l*.7+random()*1.5})}for(const it of items){it.y+=it.vy*ratio;if(it.y>274&&it.y<311){const in1=Math.abs(it.x-x1)<23,in2=Math.abs(it.x-x2)<23;if(in1||in2){const who=in1&&in2?(Math.abs(it.x-x1)<Math.abs(it.x-x2)?1:2):in1?1:2;if(who===1)a=Math.max(0,a+(it.bad?-2:1));else b=Math.max(0,b+(it.bad?-2:1));it.y=400;vsUpdate(a,b,state.vsTime);if(a>=20||b>=20){vsWin(a>b?1:2,`${a} – ${b} points!`);return}}}}items=items.filter(it=>it.y<335);vsRound(ctx);for(const it of items){vsCircle(ctx,it.x,it.y,it.bad?12:9,it.bad?'#fc6383':'#ffdf72');if(it.bad)vsText(ctx,'x',it.x,it.y+5,13,'#281a27')}ctx.fillStyle=vsColorA;ctx.fillRect(x1-20,286,40,13);ctx.fillStyle=vsColorB;ctx.fillRect(x2-20,302,40,13);vsText(ctx,'1',x1,281,12,'#fff');vsText(ctx,'2',x2,296,12,'#fff');frame(draw)}frame(draw)};
+
+// 11. NEON VOLLEY: bounce the ball over the center net. The other player must return it.
+VS_MODES.vs_volley=()=>{
+ const [c,ctx]=vsCanvas(), l=level();let p1={x:74,y:277},p2={x:270,y:277},ball={x:172,y:75,vx:2.9,vy:0},a=0,b=0,last=performance.now(),cool=0;
+ vsUpdate(a,b);vsTimer([74,65,58][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b}`));
+ const serve=()=>{ball={x:172,y:75,vx:(random()>.5?1:-1)*(2.4+l*.35),vy:-1.5}};
+ vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;q.x=vxClamp(p.x,side===1?15:190,side===1?154:329);if(p.y<235){ball.vy-=.12}});
+  botTick=()=>{const target=ball.x>160?ball.x:267;const hit=ball.x>172&&ball.y>165&&ball.y<296&&Math.abs(ball.x-p2.x)<56;cpuSet(target-p2.x,0,hit)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(40,t-last)/16.7;last=t;
+ p1.x=vxClamp(p1.x+((+vsHeld.has('d'))-(+vsHeld.has('a')))*5.8*dt,14,158);p2.x=vxClamp(p2.x+((+vsHeld.has('ArrowRight'))-(+vsHeld.has('ArrowLeft')))*5.8*dt,186,330);
+ if(vsHeld.has('f')&&t>cool&&ball.x<174&&Math.abs(ball.x-p1.x)<48){ball.vy=-6.5;cool=t+280}
+ if(vsHeld.has('j')&&t>cool&&ball.x>170&&Math.abs(ball.x-p2.x)<48){ball.vy=-6.5;cool=t+280}
+ ball.vy+=.14*dt;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
+ if(ball.x<9||ball.x>335){ball.vx*=-1;ball.x=vxClamp(ball.x,9,335)}
+ for(const [q,dir] of [[p1,1],[p2,-1]]) if(ball.vy>0&&Math.abs(ball.x-q.x)<29&&ball.y>260&&ball.y<293){ball.y=258;ball.vy=-[5.8,6.3,6.6][l];ball.vx=dir*(2+Math.abs(ball.x-q.x)/10)}
+ if(ball.y>170&&ball.y<253&&Math.abs(ball.x-172)<11){ball.vx=ball.x<172?-Math.abs(ball.vx):Math.abs(ball.vx)}
+ if(ball.y>308){if(ball.x<172)b++;else a++;vsUpdate(a,b,state.vsTime);if(a>=5||b>=5){vsWin(a>=5?1:2,`${a} – ${b}. Five points wins.`);return}serve()}
+ if(ball.y<8){ball.y=8;ball.vy=Math.abs(ball.vy)}
+ vsRound(ctx);ctx.fillStyle='#714fbb';ctx.fillRect(0,299,344,21);ctx.fillStyle='#f7f0ff';ctx.fillRect(169,179,6,121);
+ ctx.setLineDash([4,5]);ctx.strokeStyle='#ffffff75';ctx.beginPath();ctx.moveTo(172,12);ctx.lineTo(172,180);ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle=vsColorA;ctx.fillRect(p1.x-23,275,46,21);ctx.fillStyle=vsColorB;ctx.fillRect(p2.x-23,275,46,21);vsCircle(ctx,ball.x,ball.y,9,'#fff');frame(draw)
+ }frame(draw)
+};
+// 12. POWER PULL: a 15-second simultaneous button battle with a visible shared rope.
+VS_MODES.vs_tug=()=>{
+ stage.innerHTML=`<div class="vs-reflex"><div class="vs-reflex-score"><b id="tugA">0</b><b id="tugB">0</b></div><h2>POWER PULL</h2><p>Tap fast. Pull the marker to your side.</p><div class="tug-track"><div class="tug-mid"></div><div class="tug-marker" id="tugMarker"></div></div><div class="vs-reflex-buttons"><button id="tug1">P1 · F</button><button id="tug2">P2 · J</button></div><p id="tugClock">15 seconds</p></div>`;
+ let a=0,b=0,energy=0,last=[0,0];vsUpdate(0,0);
+ function hit(p){if(phase!=='playing')return;const now=performance.now(),i=p-1;if(now-last[i]<65)return;last[i]=now;if(p===1)a++;else b++;energy=vxClamp(energy+(p===1?-3.6:3.6),-100,100);$('tugA').textContent=a;$('tugB').textContent=b;$('tugMarker').style.left=`${50+energy*.43}%`;vsUpdate(a,b,state.vsTime);if(Math.abs(energy)>=99)vsWin(p,`${a} – ${b}. Rope captured!`)}
+ $('tug1').onclick=()=>hit(1);$('tug2').onclick=()=>{if(!computerMode)hit(2)};
+ keyHandler=e=>{if(e.repeat)return;if(e.key.toLowerCase()==='f')hit(1);if(e.key.toLowerCase()==='j')hit(2)};
+  if(computerMode){$('tug2').disabled=true;cpuInterval(()=>hit(2),[285,235,185][level()])}
+ vsTimer([17,15,13][level()],()=>vsWin(energy===0?0:energy<0?1:2,`${a} – ${b}. The marker decides!`));
+};
+// 13. FLAG GRAB: contest the crystal in the middle and carry it to your base.
+VS_MODES.vs_flag=()=>{
+ const [c,ctx]=vsCanvas();let p1={x:35,y:154},p2={x:310,y:154},carrier=0,gem={x:172,y:160},scores=[0,0],last=performance.now(),tagUntil=0;
+ vsUpdate(0,0);vsTimer([70,60,54][level()],()=>vsWin(scores[0]===scores[1]?0:scores[0]>scores[1]?1:2,`${scores[0]} – ${scores[1]}`));
+ vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const q=side===1?p1:p2;q.x=vxClamp(p.x,12,332);q.y=vxClamp(p.y,12,308)});
+  botTick=()=>{const target=carrier===2?{x:326,y:154}:carrier===1?p1:gem;cpuApproach(p2,target);};
+ function draw(t){if(phase!=='playing')return;let dt=Math.min(42,t-last);last=t;vsMove(p1,p2,dt,3.4+level()*.4,()=>[12,332,13,307]);
+ if(!carrier){if(Math.hypot(p1.x-gem.x,p1.y-gem.y)<23)carrier=1;else if(Math.hypot(p2.x-gem.x,p2.y-gem.y)<23)carrier=2}
+ if(carrier){const q=carrier===1?p1:p2,r=carrier===1?p2:p1;gem.x=q.x;gem.y=q.y-21;if(Math.hypot(q.x-r.x,q.y-r.y)<33&&t>tagUntil){carrier=3-carrier;tagUntil=t+950}if((carrier===1&&q.x<38)||(carrier===2&&q.x>306)){scores[carrier-1]++;vsUpdate(scores[0],scores[1],state.vsTime);if(scores.some(s=>s>=3)){vsWin(scores[0]>=3?1:2,`${scores[0]} – ${scores[1]} flags`);return}carrier=0;gem={x:172,y:160};p1.x=30;p1.y=160;p2.x=314;p2.y=160}}
+ vsRound(ctx);ctx.fillStyle='#ff719a44';ctx.fillRect(0,0,33,320);ctx.fillStyle='#b9ff7944';ctx.fillRect(311,0,33,320);vsCircle(ctx,gem.x,gem.y,10,'#fce57b');vsCircle(ctx,p1.x,p1.y,15,vsColorA);vsCircle(ctx,p2.x,p2.y,15,vsColorB);vsText(ctx,'1',p1.x,p1.y+4,11,'#1c1936');vsText(ctx,'2',p2.x,p2.y+4,11,'#1c1936');frame(draw)
+ }frame(draw)
+};
+// 14. METEOR DUEL: two independent survival lanes, competing at the same time.
+VS_MODES.vs_meteor=()=>{
+ const [c,ctx]=vsCanvas(),l=level();let p=[{x:85,lives:3,alive:true},{x:260,lives:3,alive:true}],rock=[],last=performance.now(),spawn=0,done=[false,false];vsUpdate(3,3);
+ vsTimer([48,41,34][l],()=>vsWin(p[0].lives===p[1].lives?0:p[0].lives>p[1].lives?1:2,`Lives left: ${p[0].lives} – ${p[1].lives}`));
+ vsListenCanvas(c,pos=>pos.x<172?1:2,(side,pos)=>{p[side-1].x=vxClamp(pos.x,side===1?15:190,side===1?154:329)});
+  botTick=()=>{const threat=rock.filter(r=>r.side===1&&r.y>135&&r.y<270&&Math.abs(r.x-p[1].x)<65).sort((a,b)=>b.y-a.y)[0];const target=threat?{x:threat.x>p[1].x?Math.max(195,threat.x-80):Math.min(325,threat.x+80)}:{x:257};cpuSet(target.x-p[1].x,0)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(42,t-last),ratio=dt/16.7;last=t;for(const [i,keys] of [[0,['a','d']],[1,['ArrowLeft','ArrowRight']]])p[i].x=vxClamp(p[i].x+((+vsHeld.has(keys[1]))-(+vsHeld.has(keys[0])))*6*ratio,i?187:16,i?328:157);
+ spawn+=dt;if(spawn>[330,275,230][l]){spawn=0;const side=rand(0,1);rock.push({x:rand(side?190:17,side?325:154),y:-18,vy:4+l*1.1+random()*1.9,side})}
+ for(const r of rock){r.y+=r.vy*ratio;const q=p[r.side];if(Math.abs(r.y-268)<16&&Math.abs(r.x-q.x)<22){r.y=999;q.lives--;vsUpdate(p[0].lives,p[1].lives,state.vsTime);if(q.lives<=0){vsWin(r.side===0?2:1,'The last survivor wins!');return}}}rock=rock.filter(r=>r.y<333);vsRound(ctx);ctx.fillStyle='#ffffff22';ctx.fillRect(171,0,2,320);for(const r of rock){vsCircle(ctx,r.x,r.y,11,r.side?'#b9ff79':'#ff78ac');vsCircle(ctx,r.x,r.y,4,'#fff4')}
+ for(let i=0;i<2;i++){const q=p[i];ctx.fillStyle=i?vsColorB:vsColorA;ctx.beginPath();ctx.moveTo(q.x,246);ctx.lineTo(q.x-17,288);ctx.lineTo(q.x+17,288);ctx.fill();vsText(ctx,`${q.lives} LIFE`,i?257:86,30,15,'#fff')}frame(draw)
+ }frame(draw)
+};
+// 15. POP DUEL: each player taps targets on their own half for points.
+VS_MODES.vs_pop=()=>{
+ const [c,ctx]=vsCanvas(),l=level();let targets=[],a=0,b=0,last=performance.now(),spawn=0;vsUpdate(0,0);
+ vsTimer([34,28,25][l],()=>vsWin(a===b?0:a>b?1:2,`${a} – ${b} balloons popped`));
+ c.addEventListener('pointerdown',e=>{if(phase!=='playing')return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)*344/r.width,y=(e.clientY-r.top)*320/r.height;let hit=-1;for(let i=targets.length-1;i>=0;i--)if(Math.hypot(x-targets[i].x,y-targets[i].y)<targets[i].rad){hit=i;break}if(hit>=0){const t=targets.splice(hit,1)[0];if(t.side===0)a+=t.bad?-2:1;else b+=t.bad?-2:1;a=Math.max(0,a);b=Math.max(0,b);vsUpdate(a,b,state.vsTime)}});
+  let botLast=0;botTick=t=>{if(t-botLast<340-50*level())return;const i=targets.findIndex(x=>x.side===1&&!x.bad);if(i<0)return;botLast=t;targets.splice(i,1);b++;vsUpdate(a,b,state.vsTime)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(42,t-last);last=t;spawn+=dt;if(spawn>[350,280,235][l]){spawn=0;let side=rand(0,1);targets.push({x:rand(side?190:19,side?325:154),y:rand(35,275),rad:rand(12,19),ttl:[1120,920,720][l],side,bad:random()<.15})}
+ for(const tar of targets)tar.ttl-=dt;targets=targets.filter(tar=>tar.ttl>0);vsRound(ctx);ctx.fillStyle='#ffffff22';ctx.fillRect(170,0,4,320);for(const tar of targets){ctx.globalAlpha=Math.min(1,tar.ttl/200);vsCircle(ctx,tar.x,tar.y,tar.rad,tar.bad?'#ffd65e':tar.side?vsColorB:vsColorA);vsText(ctx,tar.bad?'X':'+',tar.x,tar.y+5,16,'#1a1c36');ctx.globalAlpha=1}vsText(ctx,`${a}`,86,28,22,vsColorA);vsText(ctx,`${b}`,258,28,22,vsColorB);frame(draw)
+ }frame(draw)
+};
+// 16. BRICK BRAWL: two independently moving paddles; first to clear their bricks wins.
+VS_MODES.vs_bricks=()=>{
+ const [c,ctx]=vsCanvas(),l=level();let x=[83,260],balls=[{x:85,y:200,vx:1.7,vy:-3.7},{x:259,y:200,vx:-1.7,vy:-3.7}],bricks=Array.from({length:2},(_,side)=>Array.from({length:15},(_,i)=>({x:(side?180:7)+(i%5)*31,y:35+Math.floor(i/5)*25,alive:true}))),points=[0,0],last=performance.now();
+ vsUpdate(0,0);vsTimer([80,70,60][l],()=>vsWin(points[0]===points[1]?0:points[0]>points[1]?1:2,`${points[0]} – ${points[1]} bricks`));
+ vsListenCanvas(c,pos=>pos.x<172?1:2,(side,pos)=>{x[side-1]=vxClamp(pos.x,side===1?24:198,side===1?150:320)});
+  botTick=()=>cpuSet(balls[1].x-x[1],0);
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(42,t-last)/16.7;last=t;
+ x[0]=vxClamp(x[0]+((+vsHeld.has('d'))-(+vsHeld.has('a')))*5.7*dt,24,149);x[1]=vxClamp(x[1]+((+vsHeld.has('ArrowRight'))-(+vsHeld.has('ArrowLeft')))*5.7*dt,197,320);
+ for(let i=0;i<2;i++){const ball=balls[i],left=i?181:8,right=i?337:163;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;if(ball.x<left||ball.x>right){ball.vx*=-1;ball.x=vxClamp(ball.x,left,right)}if(ball.y<12){ball.vy=Math.abs(ball.vy)}if(ball.y>275&&ball.y<295&&Math.abs(ball.x-x[i])<27&&ball.vy>0){ball.vy=-Math.abs(ball.vy);ball.vx=(ball.x-x[i])*.105}if(ball.y>322){ball.x=i?259:85;ball.y=210;ball.vy=-3.8-l*.5}for(const brick of bricks[i])if(brick.alive&&Math.abs(ball.x-(brick.x+13))<17&&Math.abs(ball.y-(brick.y+8))<13){brick.alive=false;ball.vy*=-1;points[i]++;vsUpdate(points[0],points[1],state.vsTime);if(points[i]>=15){vsWin(i+1,'All fifteen bricks cleared!');return}break}}
+ vsRound(ctx);ctx.fillStyle='#ffffff20';ctx.fillRect(171,0,2,320);
+ bricks.forEach((list,i)=>list.forEach(b=>{if(b.alive){ctx.fillStyle=i?vsColorB:vsColorA;ctx.fillRect(b.x,b.y,27,19)}}));
+ x.forEach((v,i)=>{ctx.fillStyle=i?vsColorB:vsColorA;ctx.fillRect(v-26,291,52,9);vsCircle(ctx,balls[i].x,balls[i].y,7,'#fff')});frame(draw)
+ }frame(draw)
+};
+// 17. DOTS & BOXES: turn-based strategy. Close a box to earn a point and another turn.
+VS_MODES.vs_boxes=()=>{
+ const [c,ctx]=vsCanvas();const edges=new Set(),owner=Array(9).fill(0);let turn=1,score=[0,0];vsUpdate(0,0);
+ const dx=71,dy=65,ox=65,oy=58;
+ function link(orient,x,y){return `${orient}:${x}:${y}`}
+ function filled(x,y){return edges.has(link('h',x,y))&&edges.has(link('h',x,y+1))&&edges.has(link('v',x,y))&&edges.has(link('v',x+1,y))}
+ function paint(){vsRound(ctx);for(let y=0;y<3;y++)for(let x=0;x<3;x++){if(owner[y*3+x]){ctx.fillStyle=owner[y*3+x]===1?'#ff78ac66':'#b4ff7766';ctx.fillRect(ox+x*dx+4,oy+y*dy+4,dx-8,dy-8)}}
+ for(let y=0;y<4;y++)for(let x=0;x<3;x++){ctx.strokeStyle=edges.has(link('h',x,y))?'#ffffff':'#ffffff30';ctx.lineWidth=edges.has(link('h',x,y))?7:4;ctx.beginPath();ctx.moveTo(ox+x*dx,oy+y*dy);ctx.lineTo(ox+(x+1)*dx,oy+y*dy);ctx.stroke()}
+ for(let y=0;y<3;y++)for(let x=0;x<4;x++){ctx.strokeStyle=edges.has(link('v',x,y))?'#ffffff':'#ffffff30';ctx.lineWidth=edges.has(link('v',x,y))?7:4;ctx.beginPath();ctx.moveTo(ox+x*dx,oy+y*dy);ctx.lineTo(ox+x*dx,oy+(y+1)*dy);ctx.stroke()}
+ for(let y=0;y<4;y++)for(let x=0;x<4;x++)vsCircle(ctx,ox+x*dx,oy+y*dy,7,'#fff');vsText(ctx,`PLAYER ${turn} · CONNECT THE DOTS`,172,22,14,turn===1?vsColorA:vsColorB);vsText(ctx,`${score[0]}  :  ${score[1]}`,172,308,19,'#fff')}
+ c.addEventListener('pointerdown',e=>{if(phase!=='playing')return;const rect=c.getBoundingClientRect(),px=(e.clientX-rect.left)*344/rect.width,py=(e.clientY-rect.top)*320/rect.height;let best=null,dist=16;
+ for(let y=0;y<4;y++)for(let x=0;x<3;x++){const d=Math.abs(py-(oy+y*dy))+Math.max(0,Math.abs(px-(ox+(x+.5)*dx))-dx/2);if(d<dist){best=link('h',x,y);dist=d}}
+ for(let y=0;y<3;y++)for(let x=0;x<4;x++){const d=Math.abs(px-(ox+x*dx))+Math.max(0,Math.abs(py-(oy+(y+.5)*dy))-dy/2);if(d<dist){best=link('v',x,y);dist=d}}
+ if(!best||edges.has(best)||(computerMode&&turn===2))return;edges.add(best);let claims=0;for(let y=0;y<3;y++)for(let x=0;x<3;x++)if(!owner[y*3+x]&&filled(x,y)){owner[y*3+x]=turn;score[turn-1]++;claims++}vsUpdate(...score);if(edges.size===24||score.some(x=>x>=5)){paint();vsWin(score[0]===score[1]?0:score[0]>score[1]?1:2,`${score[0]} – ${score[1]} boxes`);return}if(!claims)turn=3-turn;paint();if(computerMode&&turn===2)later(cpuEdge,[550,350,230][level()])});function cpuEdge(){if(phase!=='playing'||turn!==2)return;const remaining=[];for(let y=0;y<4;y++)for(let x=0;x<3;x++)if(!edges.has(link('h',x,y)))remaining.push(link('h',x,y));for(let y=0;y<3;y++)for(let x=0;x<4;x++)if(!edges.has(link('v',x,y)))remaining.push(link('v',x,y));if(!remaining.length)return;let best=remaining[0],bestScore=-Infinity;for(const key of remaining){edges.add(key);let formed=0,danger=0;for(let y=0;y<3;y++)for(let x=0;x<3;x++){if(owner[y*3+x])continue;const surrounding=[link('h',x,y),link('h',x,y+1),link('v',x,y),link('v',x+1,y)].filter(z=>edges.has(z)).length;if(surrounding===4)formed++;else if(surrounding===3)danger++}edges.delete(key);const pts=formed*10-danger*2+random()*.8;if(pts>bestScore){bestScore=pts;best=key}}edges.add(best);let claims=0;for(let y=0;y<3;y++)for(let x=0;x<3;x++)if(!owner[y*3+x]&&filled(x,y)){owner[y*3+x]=2;score[1]++;claims++}vsUpdate(...score);if(edges.size===24||score.some(z=>z>=5)){paint();vsWin(score[0]===score[1]?0:score[0]>score[1]?1:2,`${score[0]} – ${score[1]} boxes`);return}if(!claims)turn=1;paint();if(turn===2)later(cpuEdge,[550,350,230][level()])}paint()
+};
+// 18. MIND GAMES: concealed turn-based rock-paper-scissors, first to five.
+VS_MODES.vs_mind=()=>{
+ let scores=[0,0],p1=null,round=1;
+ const options=['ROCK','PAPER','SCISSORS'];
+ function screen(){if(phase!=='playing')return;const player=p1===null?1:2;stage.innerHTML=`<div class="vs-reflex mind-panel"><div class="vs-reflex-score"><b>${scores[0]}</b><b>${scores[1]}</b></div><h2>ROUND ${round}</h2><p>PLAYER ${player}, CHOOSE IN PRIVATE</p><div class="mind-choices">${options.map((x,i)=>`<button data-mind="${i}">${x}</button>`).join('')}</div><p>First to five wins. Keep your choice secret.</p></div>`;
+ stage.querySelectorAll('[data-mind]').forEach(b=>b.onclick=()=>{const pick=+b.dataset.mind;if(p1===null){p1=pick;if(computerMode){const first=p1;later(()=>{if(phase!=='playing')return;const bot=rand(0,2);const winner=first===bot?0:(first+1)%3===bot?2:1;if(winner)scores[winner-1]++;vsUpdate(...scores);const txt=`YOU: ${options[first]} · CPU: ${options[bot]}`;p1=null;if(scores.some(s=>s>=5)){vsWin(scores[0]>=5?1:2,txt);return}stage.innerHTML=`<div class="center"><h3>${winner?winner===1?'YOU SCORE':'COMPUTER SCORES':'TIE ROUND'}</h3><p>${txt}</p><button class="btn main" id="mindNext">NEXT ROUND</button></div>`;$('mindNext').onclick=()=>{round++;screen()}},450);stage.innerHTML='<div class="center"><h3>COMPUTER THINKING</h3><p>Opponent choosing...</p></div>';return}stage.innerHTML='<div class="center"><h3>PLAYER 1 LOCKED IN</h3><p>Pass the screen to Player 2. No peeking.</p><button class="btn main" id="ready2">PLAYER 2 READY</button></div>';$('ready2').onclick=screen;return}
+ const winner=p1===pick?0:(p1+1)%3===pick?2:1;if(winner)scores[winner-1]++;vsUpdate(...scores);const txt=`P1: ${options[p1]} · P2: ${options[pick]}`;p1=null;
+ if(scores.some(s=>s>=5)){vsWin(scores[0]>=5?1:2,txt);return}
+ stage.innerHTML=`<div class="center"><h3>${winner?`PLAYER ${winner} SCORES`:'TIE ROUND'}</h3><p>${txt}</p><button class="btn main" id="mindNext">NEXT ROUND</button></div>`;$('mindNext').onclick=()=>{round++;screen()}
+ })}
+ vsUpdate(0,0);screen()
+};
+// 19. CANNON CLASH: two players steer turrets and shoot arcing projectiles.
+VS_MODES.vs_cannon=()=>{
+ const [c,ctx]=vsCanvas(),l=level();let turrets=[{x:43,y:269,angle:-.9,hp:5},{x:300,y:269,angle:-2.3,hp:5}],shots=[],cool=[0,0],last=performance.now();vsUpdate(0,0);
+ vsTimer([76,65,55][l],()=>vsWin(turrets[0].hp===turrets[1].hp?0:turrets[0].hp>turrets[1].hp?1:2,`Health: ${turrets[0].hp} – ${turrets[1].hp}`));
+ function fire(i,t){if(t<cool[i])return;const turret=turrets[i];shots.push({x:turret.x,y:turret.y,vx:Math.cos(turret.angle)*[6.8,7.5,8][l],vy:Math.sin(turret.angle)*[6.8,7.5,8][l],owner:i});cool[i]=t+640}
+ vsListenCanvas(c,p=>p.x<172?1:2,(side,p)=>{const i=side-1,q=turrets[i],angle=Math.atan2(p.y-q.y,p.x-q.x);q.angle=i===0?vxClamp(angle,-1.5,-.22):vxClamp(angle,-2.94,-1.62);fire(i,performance.now())});
+  botTick=t=>{const q=turrets[1],dx=turrets[0].x-q.x,dy=turrets[0].y-q.y;const desired=vxClamp(Math.atan2(dy-55,dx),-2.94,-1.62);cpuSet(0,(desired-q.angle)*-400,Math.abs(desired-q.angle)<.35)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(42,t-last)/16.7;last=t;
+ if(vsHeld.has('w'))turrets[0].angle-=.025*dt;if(vsHeld.has('s'))turrets[0].angle+=.025*dt;
+ if(vsHeld.has('ArrowUp'))turrets[1].angle+=.025*dt;if(vsHeld.has('ArrowDown'))turrets[1].angle-=.025*dt;
+ turrets[0].angle=vxClamp(turrets[0].angle,-1.52,-.20);turrets[1].angle=vxClamp(turrets[1].angle,-2.94,-1.62);
+ if(vsHeld.has('f'))fire(0,t);if(vsHeld.has('j'))fire(1,t);
+ for(const s of shots){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vy+=.095*dt;const q=turrets[1-s.owner];if(Math.hypot(s.x-q.x,s.y-q.y)<23){s.y=999;q.hp--;vsUpdate(5-turrets[0].hp,5-turrets[1].hp,state.vsTime);if(q.hp<=0){vsWin(s.owner+1,'Five direct hits!');return}}}
+ shots=shots.filter(s=>s.x>-12&&s.x<356&&s.y<325);vsRound(ctx);ctx.fillStyle='#59458c';ctx.fillRect(0,287,344,33);
+ turrets.forEach((q,i)=>{vsCircle(ctx,q.x,q.y,19,i?vsColorB:vsColorA);ctx.strokeStyle=i?vsColorB:vsColorA;ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+Math.cos(q.angle)*33,q.y+Math.sin(q.angle)*33);ctx.stroke();vsText(ctx,`${q.hp} HP`,i?263:80,24,16,'white')});
+ for(const s of shots)vsCircle(ctx,s.x,s.y,5,'#fff');frame(draw)
+ }frame(draw)
+};
+// 20. FREEZE TAG: a live two-player chase game with changing roles.
+VS_MODES.vs_tag=()=>{
+ const [c,ctx]=vsCanvas(),l=level();let p1={x:48,y:70},p2={x:290,y:255},chaser=1,points=[0,0],taggedAt=performance.now(),last=performance.now();vsUpdate(0,0);
+ vsTimer([60,53,46][l],()=>vsWin(points[0]===points[1]?0:points[0]>points[1]?1:2,`${points[0]} – ${points[1]} tags and escapes`));
+ vsListenCanvas(c,p=>p.x<172?1:2,(side,pos)=>{const q=side===1?p1:p2;q.x=vxClamp(pos.x,14,330);q.y=vxClamp(pos.y,14,306)});
+  botTick=()=>{const flee=chaser===1,tar=flee?{x:vxClamp(p2.x+(p2.x-p1.x)*1.4,20,325),y:vxClamp(p2.y+(p2.y-p1.y)*1.4,20,300)}:p1;cpuApproach(p2,tar)};
+ function draw(t){if(phase!=='playing')return;const dt=Math.min(43,t-last);last=t;vsMove(p1,p2,dt,[3.1,3.5,3.8][l],()=>[15,329,15,305]);
+ const tagger=chaser===1?p1:p2,runner=chaser===1?p2:p1;
+ if(Math.hypot(tagger.x-runner.x,tagger.y-runner.y)<28&&t-taggedAt>900){points[chaser-1]++;chaser=3-chaser;taggedAt=t;runner.x=chaser===1?260:75;runner.y=160;vsUpdate(...points,state.vsTime)}
+ if(t-taggedAt>8500){points[2-chaser]++;chaser=3-chaser;taggedAt=t;vsUpdate(...points,state.vsTime)}
+ if(points.some(x=>x>=6)){vsWin(points[0]>points[1]?1:2,`${points[0]} – ${points[1]}. Six points wins!`);return}
+ vsRound(ctx);ctx.strokeStyle='#ffe4ff70';ctx.setLineDash([7,9]);ctx.strokeRect(30,24,284,272);ctx.setLineDash([]);
+ for(const [q,i] of [[p1,1],[p2,2]]){vsCircle(ctx,q.x,q.y,16,i===1?vsColorA:vsColorB);vsText(ctx,i===chaser?'TAG':String(i),q.x,q.y+4,i===chaser?11:14,'#191e38')}
+ vsText(ctx,`CHASER: P${chaser}`,172,22,15,'#fff');frame(draw)
+ }frame(draw)
+};
+
+function copyText(t){if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(t).then(()=>toast('Challenge copied'),()=>fallbackCopy(t))}return fallbackCopy(t)}
+function fallbackCopy(t){const el=document.createElement('textarea');el.value=t;el.style.position='fixed';el.style.top='-1000px';document.body.appendChild(el);el.select();try{document.execCommand('copy');toast('Challenge copied')}catch{toast('Select the code to copy')}el.remove()}
+function makeCode(){const g=GAMES[idx];return 'BF-'+g.id.toUpperCase()+'-'+difficulty[0].toUpperCase()+'-'+currentSeed.toString(36).toUpperCase()+'-'+Math.round(state.score||0)+'-'+(phase==='won'?1:0)}
+function parseCode(raw){const m=String(raw).trim().toUpperCase().match(/^BF-([A-Z]+)-([NHX])-([A-Z0-9]+)-(\d+)-([01])$/);if(!m)throw Error('Check the code and try again');const i=GAMES.findIndex(g=>g.id.toUpperCase()===m[1]),d={N:'normal',H:'hard',X:'nightmare'}[m[2]],seed=parseInt(m[3],36),score=Number(m[4]);if(i<0||!d||!Number.isSafeInteger(seed)||score>1000000)throw Error('Invalid challenge code');return{i,d,seed,score,won:m[5]==='1'}}
+function loadCode(raw){try{const c=parseCode(raw);gameMode='solo';difficulty=c.d;goGame(c.i);currentSeed=c.seed;challengeTarget={score:c.score,won:c.won};updateCard();preview();closeSheet();toast('Friend challenge loaded')}catch(e){toast(e.message)}}
+function sheet(title,body){$('sheetTitle').textContent=title;$('sheetBody').innerHTML=body;$('overlay').hidden=false}
+function closeSheet(){$('overlay').hidden=true}
+function friendSheet(){if(gameMode==='versus'){sheet('Choose your rival', '<p>Choose <strong>COMPUTER</strong> to play against the built-in bot, or <strong>2 PLAYERS</strong> for head-to-head games with someone on the same device.</p><p>You control pink. The computer controls lime. Bots make their own moves without using the internet.</p><p class="smallprint">Live matches across two devices are not connected yet.</p>');return}sheet('Challenge your friends',`<p>Play against someone on another device. Copy a challenge code and send it to them. They can enter it in their BattleFeed.</p><button class="btn main full" id="copyFriend">COPY MY CHALLENGE</button><p style="margin-top:18px;margin-bottom:5px"><strong>Have a code?</strong></p><input id="friendCodeInput" autocapitalize="characters" autocomplete="off" placeholder="BF-TAP-N-XXXX-0-0" aria-label="Friend challenge code"><button class="btn white full" id="loadFriend">PLAY THEIR CHALLENGE</button><p class="smallprint">Same game rules and randomized setup. No live online matchmaking in this version. Both players must have BattleFeed.</p>`);$('copyFriend').onclick=()=>{copyText(makeCode());$('copyFriend').textContent='COPIED';};$('loadFriend').onclick=()=>loadCode($('friendCodeInput').value)}
+function statsSheet(){sheet('Your BattleFeed',`<p>Your stats are saved on this device.</p><div class="stats-row"><span>Rounds played</span><strong>${progress.plays}</strong></div><div class="stats-row"><span>Wins</span><strong>${progress.wins}</strong></div><div class="stats-row"><span>Challenges cleared</span><strong>${Object.values(progress.conquered).filter(Boolean).length} / ${gameCount}</strong></div><p style="margin-top:18px"><strong>PERSONAL BESTS</strong></p><div style="max-height:170px;overflow:auto">${GAMES.filter(g=>Object.keys(progress.best||{}).some(k=>k.startsWith(g.id+'-'))).map(g=>`<div class="stats-row"><span>${g.name}</span><strong>${Math.max(0,...Object.entries(progress.best).filter(([k,v])=>k.startsWith(g.id+'-')).map(([k,v])=>v))}</strong></div>`).join('')||'<p>Play a few rounds to build your records.</p>'}</div>`)}
+function infoSheet(){sheet('How BattleFeed works',`<p><strong>Swipe:</strong> Scroll with two fingers or swipe up and down to move through each feed, even mid-game.</p><p><strong>Solo:</strong> 20 quick challenges. <strong>Versus:</strong> 20 different head-to-head games, including hockey, pong, racing-style survival, territory battles, and strategy. Versus lets you challenge the computer or another person on the same device.</p><p><strong>Mac controls:</strong> Player 1 uses W/A/S/D, Player 2 uses the arrow keys. Some games use F and J. On phones, players can drag or tap in supported games.</p><p><strong>Difficulty:</strong> Normal, Hard, or Nightmare. <strong>Computer:</strong> An offline bot controls the lime side. <strong>Online:</strong> Live remote matches are not available yet.</p>`)}
+function setMode(mode){if(mode===gameMode)return;gameMode=mode;GAMES=mode==='versus'?VS_GAMES:SOLO_GAMES;gameCount=GAMES.length;$('totalModes').textContent=gameCount+' GAMES';$('sideTotal').textContent=gameCount;clearDeck();goGame(0);toast(mode==='versus'?'20 head-to-head games':'20 solo games')}
+$('cpuBtn').onclick=()=>{if(!computerMode){computerMode=true;goGame(idx);toast('Computer opponent ready')}};$('localBtn').onclick=()=>{if(computerMode){computerMode=false;goGame(idx);toast('Two-player mode ready')}};
+$('soloBtn').onclick=()=>setMode('solo');$('versusBtn').onclick=()=>setMode('versus');$('nextBtn').onclick=nextGame;$('prevBtn').onclick=prevGame;$('restartBtn').onclick=()=>{if(gameMode==='versus'){currentSeed=newSeed();startGame()}else{if(!challengeTarget)currentSeed=newSeed();startGame()}};
+$('shareBtn').onclick=friendSheet;$('friendBtn').onclick=friendSheet;$('infoBtn').onclick=infoSheet;$('feedNav').onclick=()=>{closeSheet();toast('You are on the feed')};$('shuffleNav').onclick=()=>{closeSheet();randomGame()};$('statsNav').onclick=statsSheet;$('closeSheet').onclick=closeSheet;$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeSheet()});
+$('diffrow').addEventListener('click',e=>{const b=e.target.closest('[data-diff]');if(!b)return;difficulty=b.dataset.diff;goGame(idx)});
+window.addEventListener('keydown',e=>{if(gameMode==='versus'&&computerMode&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','l'].includes(e.key)){e.preventDefault();return;}if(gameMode==='versus'&&phase==='playing'&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d','f','l','j'].includes(e.key)){vsHeld.add(e.key);e.preventDefault()}if(e.key==='Escape')closeSheet();if(!$('overlay').hidden)return;if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;if(phase==='playing'&&keyHandler)keyHandler(e)});
+window.addEventListener('keyup',e=>{if(!(computerMode&&cpuKeys.includes(e.key)))vsHeld.delete(e.key)});window.addEventListener('blur',()=>vsHeld.clear());
+// Smooth full-screen swipe engine, designed for Mac trackpad and mobile touch.
+// Each gesture carries both cards through the viewport on the compositor.
+// Once a swipe commits, the trackpad's inertia is consumed before another swipe starts.
+const viewport=$('swipeViewport'), currentCard=$('gameCard');
+let deck=null, swipingLocked=false, wheelAmount=0, wheelIdle=null, swipeTouch=null, suppressClicksUntil=0;
+let deckPaintId=0, pendingDeckOffset=null, wheelMomentumGate=false, wheelGestureDir=0;
+const reducedMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function deckHeight(){return Math.max(260,viewport.clientHeight)}
+function deckPreview(gameIndex){
+ const g=GAMES[(gameIndex+GAMES.length)%GAMES.length];
+ // Clone the ACTUAL game card layout rather than a different teaser design.
+ // This eliminates the visible pop/resize when a swipe settles.
+ const card=currentCard.cloneNode(true);
+ card.className='feed-main theme-'+g.theme+' peek-card';card.removeAttribute('id');card.setAttribute('aria-hidden','true');
+ const write=(id,value)=>{const el=card.querySelector('#'+id);if(el)el.textContent=value};
+ write('gameTitle',g.name);write('gameSubtitle',g.sub);
+ write('gameNumber','ROUND '+String(gameIndex+1).padStart(2,'0')+' / '+gameCount+'  ·  '+g.category);
+ write('gameDesc',howToPlay(g));write('friendMeta',gameMode==='versus'?(computerMode?'YOU VS COMPUTER':'TWO PLAYER LOCAL MATCH'):'SWIPE ANYTIME · EVEN MID-GAME');
+ write('scoreHUD','SCORE  0');write('clockHUD','READY');
+ const space=card.querySelector('#stage');
+ if(space)space.innerHTML=`<div class="center"><div class="starticon">${g.symbol}</div><h3>${g.name}</h3><p>${howToPlay(g)}</p><button class="btn main">${gameMode==='versus'?(computerMode?'PLAY COMPUTER':'START 2 PLAYER MATCH'):'PLAY NOW'}</button></div>`;
+ card.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+ return card;
+}
+function prepareDeck(direction,target){
+ if(swipingLocked)return null;
+ if(deck&&deck.direction!==direction)clearDeck();
+ if(!deck){
+  const targetIndex=Number.isInteger(target)?target:(idx+direction+GAMES.length)%GAMES.length;
+  const incoming=deckPreview(targetIndex);
+  viewport.appendChild(incoming);
+  viewport.classList.add('in-motion');
+  deck={direction,targetIndex,incoming,offset:0};
+  placeDeck(0,false);
+ }
+ return deck;
+}
+function placeDeck(offset,animate){
+ if(!deck)return;
+ const h=deckHeight(),limit=Math.min(h,Math.max(-h,offset)),sign=deck.direction;
+ deck.offset=limit;
+ const transition=animate&&!reducedMotion?'transform 290ms cubic-bezier(.22,.76,.22,1)':'none';
+ currentCard.style.transition=transition;
+ deck.incoming.style.transition=transition;
+ currentCard.style.transform=`translate3d(0,${-limit}px,0)`;
+ deck.incoming.style.transform=`translate3d(0,${sign*h-limit}px,0)`;
+}
+function clearDeck(){
+ if(deckPaintId){cancelAnimationFrame(deckPaintId);deckPaintId=0}pendingDeckOffset=null;
+ viewport.classList.remove('in-motion');
+ if(deck){deck.incoming.remove();deck=null}
+ currentCard.style.transition='none';currentCard.style.transform='translate3d(0,0,0)';
+ wheelAmount=0;wheelGestureDir=0;
+}
+function paintDeckSoon(offset){
+ pendingDeckOffset=offset;
+ if(deckPaintId)return;
+ deckPaintId=requestAnimationFrame(()=>{
+  deckPaintId=0;const value=pendingDeckOffset;pendingDeckOffset=null;
+  if(deck&&!swipingLocked&&value!==null)placeDeck(value,false);
+ });
+}
+function freezeCurrentGame(){
+ if(phase==='playing'){
+  clearInterval(state.timer);tasks.forEach(clearTimeout);tasks=[];rafs.forEach(cancelAnimationFrame);rafs.clear();
+  session++;phase='transition';keyHandler=null;vsHeld.clear();vsPointers.clear();
+ }
+}
+function settleDeck(commit,instant=false){
+ if(!deck||swipingLocked)return;
+ if(deckPaintId){cancelAnimationFrame(deckPaintId);deckPaintId=0;pendingDeckOffset=null}
+ if(!commit){
+  const d=deck;
+  if(instant){clearDeck();return}
+  swipingLocked=true;
+  placeDeck(0,true);
+  setTimeout(()=>{if(deck===d)clearDeck();swipingLocked=false},reducedMotion?35:310);
+  return;
+ }
+ const d=deck;
+ freezeCurrentGame();
+ swipingLocked=true;suppressClicksUntil=Date.now()+360;
+ placeDeck(d.direction*deckHeight(),true);
+ setTimeout(()=>{
+  if(deck!==d)return;
+  // Next round appears only after the previous frame has fully slid away.
+  clearDeck();goGame(d.targetIndex);
+  swipingLocked=false;
+ },reducedMotion?40:315);
+}
+function animatedNavigation(direction,target){
+ if(swipingLocked)return;
+ if(deck)clearDeck();
+ prepareDeck(direction,target);
+ requestAnimationFrame(()=>requestAnimationFrame(()=>settleDeck(true)));
+}
+// A Mac trackpad sends many small scrolling events, even after fingers lift.
+// Do not interpret those inertia events as extra swipes.
+function wheelWentQuiet(){
+ clearTimeout(wheelIdle);
+ wheelIdle=setTimeout(()=>{
+  if(deck&&!swipingLocked)settleDeck(Math.abs(deck.offset)>=Math.min(62,deckHeight()*.12));
+  wheelMomentumGate=false;
+  wheelGestureDir=0;wheelAmount=0;
+ },185);
+}
+viewport.addEventListener('wheel',e=>{
+ if(!$('overlay').hidden||e.ctrlKey)return;
+ if(Math.abs(e.deltaY)<.7||Math.abs(e.deltaX)>Math.abs(e.deltaY)*1.3)return;
+ e.preventDefault();
+ // Keep consuming the inertial tail until there is a real pause in scrolling.
+ if(wheelMomentumGate||swipingLocked||Date.now()<suppressClicksUntil){wheelWentQuiet();return}
+ const raw=e.deltaY*(e.deltaMode===1?18:e.deltaMode===2?deckHeight():1);
+ if(!Number.isFinite(raw)||!raw)return;
+ const direction=raw>0?1:-1;
+ if(wheelGestureDir&&direction!==wheelGestureDir){wheelWentQuiet();return}
+ wheelGestureDir=direction;
+ if(!prepareDeck(direction))return;
+ // Clamp one giant mouse-wheel event to preserve a visible in-between frame.
+ wheelAmount=Math.min(deckHeight()*.84,wheelAmount+Math.min(Math.abs(raw)*1.35,deckHeight()*.38));
+ // Paint the partial slide BEFORE committing. The old handler canceled this paint.
+ placeDeck(direction*wheelAmount,false);
+ wheelWentQuiet();
+ if(wheelAmount>=Math.min(95,deckHeight()*.18)){
+  wheelMomentumGate=true;
+  requestAnimationFrame(()=>{if(deck&&!swipingLocked)settleDeck(true)});
+ }
+},{passive:false});
+// Touch devices: directly follow the finger; swipe anytime, even during a game.
+viewport.addEventListener('touchstart',e=>{
+ if(!$('overlay').hidden||swipingLocked||e.touches.length!==1||Date.now()<suppressClicksUntil)return;
+ swipeTouch={x:e.touches[0].clientX,y:e.touches[0].clientY,vertical:false,start:performance.now()};
+},{passive:true});
+viewport.addEventListener('touchmove',e=>{
+ if(!swipeTouch||swipingLocked||e.touches.length!==1)return;
+ const dx=e.touches[0].clientX-swipeTouch.x,dy=e.touches[0].clientY-swipeTouch.y;
+ if(!swipeTouch.vertical&&Math.abs(dy)>11&&Math.abs(dy)>Math.abs(dx)*1.3)swipeTouch.vertical=true;
+ if(!swipeTouch.vertical)return;
+ if(e.cancelable)e.preventDefault();
+ const direction=dy<0?1:-1;
+ if(!prepareDeck(direction))return;
+ paintDeckSoon(-dy);
+},{passive:false});
+viewport.addEventListener('touchend',e=>{
+ if(!swipeTouch)return;
+ const start=swipeTouch;swipeTouch=null;
+ if(!start.vertical||!deck||swipingLocked)return;
+ const dy=e.changedTouches[0].clientY-start.y;
+ const velocity=Math.abs(dy)/Math.max(1,performance.now()-start.start);
+ if(Math.abs(dy)>Math.min(80,deckHeight()*.16)||(Math.abs(dy)>28&&velocity>.5))settleDeck(true);
+ else settleDeck(false);
+},{passive:true});
+viewport.addEventListener('touchcancel',()=>{swipeTouch=null;if(deck&&!swipingLocked)settleDeck(false)},{passive:true});
+viewport.addEventListener('click',e=>{if(Date.now()<suppressClicksUntil){e.preventDefault();e.stopPropagation()}},true);
+// Keyboard accessibility: PageDown/PageUp always swipe, even during gameplay.
+window.addEventListener('keydown',e=>{
+ if(!$('overlay').hidden||['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+ if(e.key==='PageDown'||e.key==='PageUp'){e.preventDefault();animatedNavigation(e.key==='PageDown'?1:-1)}
+},true);
+refreshStats();goGame(0);
+try{const code=new URLSearchParams(location.search).get('challenge');if(code)loadCode(code)}catch{}
+})();
+</script></body></html>
